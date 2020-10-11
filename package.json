@@ -2,7 +2,7 @@
 	"name": "vscode-sql",
 	"displayName": "vscode-sql",
 	"publisher": "benjamcalvin",
-	"repository": "https://github.com/benjamcalvin/vscode-sql/blob/main/",
+	"repository": "https://github.com/benjamcalvin/vscode-sql",
 	"description": "Plugin for interactively running SQL queries.",
 	"version": "0.0.1",
 	"engines": {

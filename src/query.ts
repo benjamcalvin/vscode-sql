@@ -84,21 +84,29 @@ export class Query {
             return values;
         }
 
-        const columns: any[] = values[0];
-        const contents: any[] = values[1];
-        console.log(contents);
-        const n_cols: number = contents[0].length;
-        console.log(n_cols);
+        try {
+            const columns: any[] = values[0];
+            const contents: any[] = values[1];
+            console.log(contents);
+            const n_cols: number = contents[0].length;
+            console.log("N cols", n_cols);
+            console.log("N rows", contents.length);
 
-        var bar_contents = {};
+            var bar_contents: any = {};
+            
+            for (var i = 0; i < contents.length; i++ ) {
+                console.log(i)
+                console.log(contents[i])
+                console.log(contents[i].slice(0, n_cols-1).join (' '))
+                bar_contents[contents[i].slice(0, n_cols-1).join (' ')] = contents[i][n_cols-1]
+            }
+            console.log(bar_contents);
+            console.log(bars(bar_contents));
 
-        for (var i = 0; i < contents.length; i++ ) {
-            bar_contents[contents[i].slice(0, n_cols-1).join (' ')] = contents[i][n_cols-1]
+            return bars(bar_contents)
+        } catch (err) {
+            return err.stack
         }
-        console.log(bar_contents);
-        console.log(bars(bar_contents));
-
-        return bars(bar_contents)
     }
     
     

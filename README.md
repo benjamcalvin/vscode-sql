@@ -9,6 +9,14 @@ Vscode-sql runs highlighted queries in the background and inserts the results in
 
 ![Running a Query](example_query.gif)
 
+### Histograms:
+
+You can insert a histogram instead of a table using `cmd+shift+h` or the `Execute SQL Command (histogram)` command.
+
+```sql
+
+```
+
 ## Installation
 
 ### Rebuilding:
@@ -40,6 +48,34 @@ stack trace: Error: TextEditor#edit not possible on closed editors
 	at runMicrotasks (<anonymous>)
 	at processTicksAndRejections (internal/process/task_queues.js:94:5)
 ```
+
+### Histogram Sometimes Fails
+
+```
+
+SELECT 'bob', 2
+UNION
+SELECT 'tom  ', 3 ;
+
+    bob | ########################################                     | 2
+  tom   | ############################################################ | 3
+
+
+SELECT 'this is a string' as my_string, 1223.4 as value
+UNION
+SELECT 'this is another string' as my_string, 844.4 as value;
+
+RangeError: Invalid array length
+	at histogram (/home/ubuntu/repos/vscode-sql/node_modules/bars/index.js:49:12)
+	at Query.format_histogram (/home/ubuntu/repos/vscode-sql/out/query.js:81:25)
+	at /home/ubuntu/repos/vscode-sql/out/extension.js:81:88
+	at t.ExtHostTextEditor.edit (/home/ubuntu/.vscode-server/bin/93c2f0fbf16c5a4b10e4d5f89737d9c2c25488a3/out/vs/server/remoteExtensionHostProcess.js:672:588)
+	at /home/ubuntu/repos/vscode-sql/out/extension.js:80:24
+	at Generator.next (<anonymous>)
+	at fulfilled (/home/ubuntu/repos/vscode-sql/out/extension.js:5:58)
+	at processTicksAndRejections (internal/process/task_queues.js:94:5)
+
+
 
 ## Release Notes
 
