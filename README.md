@@ -90,7 +90,7 @@ RangeError: Invalid array length
 	at fulfilled (/home/ubuntu/repos/vscode-sql/out/extension.js:5:58)
 	at processTicksAndRejections (internal/process/task_queues.js:94:5)
 
-
+```
 
 ## Release Notes
 
