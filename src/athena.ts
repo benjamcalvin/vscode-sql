@@ -3,7 +3,7 @@ import { DataFrame } from 'dataframe-js';
 import { wait } from "./utils";
 
 
-export async function runAthenaQuery(query: String) {
+export async function runAthenaQuery(query: string) {
     // Takes in a query and returns a DataFrame with the results.
 	var startQueryExecutionResponse = await startQueryExecution(query)
 	const queryExecutionId = startQueryExecutionResponse['QueryExecutionId']
@@ -17,7 +17,7 @@ export async function runAthenaQuery(query: String) {
         });
         console.log(getQueryResultsResponse);
 		if (getQueryResultsResponse == "Query has not yet finished. Current state: RUNNING") {
-			console.log("Waiting...", err.message);
+			console.log("Waiting...", getQueryResultsResponse);
         } else {
             queryNotDone = false;
         }
@@ -70,7 +70,7 @@ function unpackRow(row: any) {
 };
 
 
-async function startQueryExecution(query: String) {
+async function startQueryExecution(query: string) {
 	const athena = new AWS.Athena();
 	const query_params = {
 		QueryString: query,
@@ -81,7 +81,7 @@ async function startQueryExecution(query: String) {
 	return athena.startQueryExecution(query_params).promise()
 }
 
-async function getQueryResults(queryExecutionId: String) {
+async function getQueryResults(queryExecutionId: string) {
 	const athena = new AWS.Athena();
 	const query_params = {
 		QueryExecutionId: queryExecutionId

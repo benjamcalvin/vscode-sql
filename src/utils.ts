@@ -7,7 +7,7 @@ export function wait(ms: number){
    }
  }
 
-export function current_timestamp(query_num: int) {
+export function current_timestamp(query_num: number) {
      // Return a string with the current timestamp.
 	return '\n\nQuery '+ String(query_num) + ' run at: '+String(Date.now())
 }

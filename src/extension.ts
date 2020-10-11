@@ -37,8 +37,11 @@ async function runSQLTable() {
 
 		var results: DataFrame[] = [];
 		for (var i = 0; i < n_queries; i++) {
+			// This expects a tuple of results [columns, values] where columns is
+			// a 1-dimensional array of column names and values is a 2-dimensional
+			// array of rows, and columns respectively.
+
 			results.push(await runAthenaQuery(queries[i].text));
-			// const [nRows, nCols] = results[i].dim();
 			editor.edit(editBuilder => {
 				editBuilder.replace(
 					queries[i].getTimestampSelection(),
@@ -74,6 +77,9 @@ async function runSQLHistogram() {
 
 		var results: DataFrame[] = [];
 		for (var i = 0; i < n_queries; i++) {
+			// This expects a tuple of results [columns, values] where columns is
+			// a 1-dimensional array of column names and values is a 2-dimensional
+			// array of rows, and columns respectively.
 			results.push(await runAthenaQuery(queries[i].text));
 
 			editor.edit(editBuilder => {

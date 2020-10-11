@@ -84,10 +84,10 @@ export class Query {
             return values;
         }
 
-        const columns: [] = values[0];
-        const contents: [] = values[1];
+        const columns: any[] = values[0];
+        const contents: any[] = values[1];
         console.log(contents);
-        const n_cols: [] = contents[0].length;
+        const n_cols: number = contents[0].length;
         console.log(n_cols);
 
         var bar_contents = {};

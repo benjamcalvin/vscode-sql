@@ -1,49 +1,33 @@
-# vscode-sql README
+# vscode-sql
 
-This is the README for your extension "vscode-sql". After writing up a brief description, we recommend including the following sections.
+This is a plugin to facilitate interactive EDA using SQL.
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+### Running a Query
+Vscode-sql runs highlighted queries in the background and inserts the results inline. You can do this by hilighting a query (or queries) and using the command pallet `Execute SQL command` or pressing `shift+enter`.
 
-For example if there is an image subfolder under your extension project workspace:
+![Running a Query](example_query.gif)
 
-\!\[feature X\]\(images/feature-x.png\)
+## Installation
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+### Rebuilding:
+1. Navigate into the `vscode-sql` directory.
+2. Make sure `vsce` is installed:
+```bash
+npm install -g vsce
+```
+3. Package the package:
+```bash
+vsce package --baseImagesUrl https://github.com/benjamcalvin/vscode-sql/blob/main/
+```
+4. Install the .vslx file that is generated (`vscode-sql-x.x.x.vslx`) using the `Install from VSLX` option.
 
-## Requirements
-
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
-
-## Extension Settings
-
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
-This extension contributes the following settings:
-
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
+For more information, see: https://code.visualstudio.com/api/working-with-extensions/publishing-extension
 
 ## Known Issues
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
-
-## Release Notes
-
-Users appreciate release notes as you update your extension.
-
-### 0.0.1
-
-Minimum functionality. Uses AWS 
-
-**Enjoy!**
-
-
-## Known Bugs:
-
+### Leaving the Tab
 If you leave the tab to go to another tab (you *can* switch to a different window), you'll get this error and the query will fail to insert when it's done.
 
 ```
@@ -56,3 +40,11 @@ stack trace: Error: TextEditor#edit not possible on closed editors
 	at runMicrotasks (<anonymous>)
 	at processTicksAndRejections (internal/process/task_queues.js:94:5)
 ```
+
+## Release Notes
+
+### 0.0.1
+
+Minimum functionality. Uses the AWS Athena Javascript SDK to run queries.
+
+**Enjoy!**
