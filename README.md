@@ -14,6 +14,21 @@ Vscode-sql runs highlighted queries in the background and inserts the results in
 You can insert a histogram instead of a table using `cmd+shift+h` or the `Execute SQL Command (histogram)` command.
 
 ```sql
+SELECT * FROM(
+SELECT 'men', 'age 25-50', 423
+UNION
+SELECT 'women', 'age 25-50', 102
+UNION
+SELECT 'men', 'age 50-75', 32
+UNION
+SELECT 'women', 'age 50-75', 222
+) ORDER BY 1,2
+;
+
+    men age 25-50 | ############################################################ | 423
+    men age 50-75 | #####                                                        | 32
+  women age 25-50 | ##############                                               | 102
+  women age 50-75 | ###############################                              | 222
 
 ```
 
