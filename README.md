@@ -94,6 +94,12 @@ RangeError: Invalid array length
 
 ## Release Notes
 
+### 0.0.2
+
+Add metadata functionality:
+`cmd+shift+t` to open picker for tables.
+`cmd+shift+c` to open picker for columns.
+
 ### 0.0.1
 
 Minimum functionality. Uses the AWS Athena Javascript SDK to run queries.

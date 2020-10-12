@@ -120,9 +120,13 @@ async function findColumn() {
 	const selections = editor.selections;
 
 	if (editor) {
-		const selectionText = editor.document.getText(editor.selection);
-		const schemaAndTable = selectionText.split(".");
-		const columns = await listColumns(schemaAndTable[0], schemaAndTable[1]);
+		const databases = await listDatabases();
+		console.log(databases);
+		const schema = await vscode.window.showQuickPick(databases);
+		
+		const tables = await listTables(schema);
+		const table = await vscode.window.showQuickPick(tables);
+		const columns = await listColumns(schema, table);
 
 		const column = await vscode.window.showQuickPick(columns);
 		
