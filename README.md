@@ -48,6 +48,11 @@ vsce package --baseImagesUrl https://github.com/benjamcalvin/vscode-sql/blob/mai
 
 For more information, see: https://code.visualstudio.com/api/working-with-extensions/publishing-extension
 
+### Development
+1. Navigate into the `vscode-sql` directory.
+2. Hit `F5` to build the plugin and open a new window for testing.
+3. Hit `cmd+shift+F5` to refresh code changes in the debugger window.
+
 ## Known Issues
 
 ### Leaving the Tab
