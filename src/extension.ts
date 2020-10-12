@@ -3,7 +3,7 @@
 import * as vscode from 'vscode';
 import * as AWS from 'aws-sdk';
 import { DataFrame } from 'dataframe-js';
-import { runAthenaQuery } from './athena';
+import { listColumns, listDatabases, listTables, runAthenaQuery } from './athena';
 import { Query } from './query';
 import { parse_queries } from './utils';
 import { countReset } from 'console';
@@ -93,6 +93,77 @@ async function runSQLHistogram() {
 
 }
 
+async function getTables() {
+
+	const databases = await listDatabases();
+	console.log(databases);
+	const schema = await vscode.window.showQuickPick(databases);
+	
+	const tables = await listTables(schema);
+	const table = await vscode.window.showQuickPick(tables);
+
+	const editor = vscode.window.activeTextEditor;
+	const selections = editor.selections;
+
+	if (editor) {
+		editor.edit(editBuilder => {
+			for (var i = 0; i < selections.length; i++) {
+				editBuilder.replace(selections[i], schema+"."+table);
+			}
+		})
+	};
+}
+
+async function findColumn() {
+
+	const editor = vscode.window.activeTextEditor;
+	const selections = editor.selections;
+
+	if (editor) {
+		const databases = await listDatabases();
+		console.log(databases);
+		const schema = await vscode.window.showQuickPick(databases);
+		
+		const tables = await listTables(schema);
+		const table = await vscode.window.showQuickPick(tables);
+		const columns = await listColumns(schema, table);
+
+		const column = await vscode.window.showQuickPick(columns);
+		
+		if (editor) {
+			editor.edit(editBuilder => {
+				for (var i = 0; i < selections.length; i++) {
+					editBuilder.replace(selections[i], column);
+				}
+			})
+		};
+	}
+}
+
+async function getColumns() {
+
+	const editor = vscode.window.activeTextEditor;
+	const selections = editor.selections;
+
+	if (editor) {
+		
+		const databases = await listDatabases();
+		console.log(databases);
+		const schema = await vscode.window.showQuickPick(databases);
+		
+		const tables = await listTables(schema);
+		const table = await vscode.window.showQuickPick(tables);
+		const columns = await listColumns(schema, table);
+		
+		if (editor) {
+			editor.edit(editBuilder => {
+				for (var i = 0; i < selections.length; i++) {
+					editBuilder.replace(selections[i], columns.join(',\n'));
+				}
+			})
+		};
+	}
+}
 
 
 
@@ -111,9 +182,16 @@ export async function activate(context: vscode.ExtensionContext) {
 	// The commandId parameter must match the command field in package.json
 	let disposable_table = vscode.commands.registerCommand('vscode-sql.executeSQLTable', runSQLTable);
 	let disposable_histogram = vscode.commands.registerCommand('vscode-sql.executeSQLHistogram', runSQLHistogram);
+	let disposable_tables = vscode.commands.registerCommand('vscode-sql.getTables', getTables)
+	let disposable_find_column = vscode.commands.registerCommand('vscode-sql.findColumn', findColumn)
+	let disposable_get_columns = vscode.commands.registerCommand('vscode-sql.getColumns', getColumns)
+
 
 	context.subscriptions.push(disposable_table);
 	context.subscriptions.push(disposable_histogram);
+	context.subscriptions.push(disposable_tables);
+	context.subscriptions.push(disposable_find_column);
+	context.subscriptions.push(disposable_get_columns);
 }
 
 // this method is called when your extension is deactivated

@@ -4,7 +4,7 @@
 	"publisher": "benjamcalvin",
 	"repository": "https://github.com/benjamcalvin/vscode-sql",
 	"description": "Plugin for interactively running SQL queries.",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"engines": {
 		"vscode": "^1.49.0"
 	},
@@ -13,18 +13,33 @@
 	],
 	"activationEvents": [
 		"onCommand:vscode-sql.executeSQLTable",
-		"onCommand:vscode-sql.executeSQLHistogram"
+		"onCommand:vscode-sql.executeSQLHistogram",
+		"onCommand:vscode-sql.getTables",
+		"onCommand:vscode-sql.findColumn",
+		"onCommand:vscode-sql.getColumns"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
 			{
 				"command": "vscode-sql.executeSQLTable",
-				"title": "Execute SQL (Table)"
+				"title": "VS-SQL: Execute SQL (Table)"
 			},
 			{
 				"command": "vscode-sql.executeSQLHistogram",
-				"title": "Execute SQL (Histogram)"
+				"title": "VS-SQL: Execute SQL (Histogram)"
+			},
+			{
+				"command": "vscode-sql.getTables",
+				"title": "VS-SQL: Find Table"
+			},
+			{
+				"command": "vscode-sql.findColumn",
+				"title": "VS-SQL: Find Column"
+			},
+			{
+				"command": "vscode-sql.getColumns",
+				"title": "VS-SQL: List All Columns"
 			}
 		],
 		"keybindings": [
@@ -35,6 +50,14 @@
 			{
 				"command": "vscode-sql.executeSQLHistogram",
 				"key": "cmd+shift+h"
+			},
+			{
+				"command": "vscode-sql.getTables",
+				"key": "cmd+shift+t"
+			},
+			{
+				"command": "vscode-sql.findColumn",
+				"key": "cmd+shift+c"
 			}
 		]
 	},

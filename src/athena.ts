@@ -2,6 +2,7 @@ import * as AWS from 'aws-sdk';
 import { DataFrame } from 'dataframe-js';
 import { wait } from "./utils";
 
+const ATHENA_DATA_CATALOG = "AwsDataCatalog";
 
 export async function runAthenaQuery(query: string) {
     // Takes in a query and returns a DataFrame with the results.
@@ -87,4 +88,58 @@ async function getQueryResults(queryExecutionId: string) {
 		QueryExecutionId: queryExecutionId
 	}
 	return athena.getQueryResults(query_params).promise()
+}
+
+export async function listDatabases() {
+	const athena = new AWS.Athena();
+	const params = {
+		CatalogName: ATHENA_DATA_CATALOG,
+	}
+
+	const results = await athena.listDatabases(params).promise();
+	const databasesObject = results['DatabaseList']
+	var databases = [];
+
+	for (var i = 0; i < databasesObject.length; i++) {
+		databases.push(databasesObject[i].Name);
+	}
+
+	return databases;
+}
+
+export async function listTables(databaseName: string) {
+	const athena = new AWS.Athena();
+	const params = {
+		CatalogName: ATHENA_DATA_CATALOG,
+		DatabaseName: databaseName,
+	};
+
+	const results = await athena.listTableMetadata(params).promise();
+	const tableMetadataList = results['TableMetadataList'];
+	var tables = [];
+
+	for (var i = 0; i < tableMetadataList.length; i++) {
+		tables.push(tableMetadataList[i].Name)
+	}
+	console.log(tables);
+	return tables;
+}
+
+export async function listColumns(database: string, table: string) {
+	const athena = new AWS.Athena();
+	const params = {
+		CatalogName: ATHENA_DATA_CATALOG,
+		DatabaseName: database,
+		TableName: table
+	};
+
+	const results = await athena.getTableMetadata(params).promise();
+	const tableMetadata = results['TableMetadata'];
+	const columnMetadata = tableMetadata['Columns'];
+	var columns = [];
+	for (var i = 0; i < columnMetadata.length; i++) {
+		columns.push(columnMetadata[i].Name);
+	}
+
+	return columns;
 }
