@@ -97,8 +97,9 @@ RangeError: Invalid array length
 ### 0.0.2
 
 Add metadata functionality:
-`cmd+shift+t` to open picker for tables.
-`cmd+shift+c` to open picker for columns.
+- `cmd+shift+t` (`Find Table`) to open picker for tables.
+- `cmd+shift+c` (`Find Column`) to open picker for columns.
+- `List all Columns` command to insert all columns.
 
 ### 0.0.1
 
