@@ -34,6 +34,10 @@ SELECT 'women', 'age 50-75', 222
 
 ## Installation
 
+1. Navigate to release and download the latest release.
+2. In the extensions tab in VSCode, click "Install from VISX"
+3. Voila -- reload and it's installed.
+
 ### Rebuilding:
 1. Navigate into the `vscode-sql` directory.
 2. Make sure `vsce` is installed:
