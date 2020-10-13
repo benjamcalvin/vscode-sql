@@ -50,8 +50,10 @@ For more information, see: https://code.visualstudio.com/api/working-with-extens
 
 ### Development
 1. Navigate into the `vscode-sql` directory.
-2. Hit `F5` to build the plugin and open a new window for testing.
-3. Hit `cmd+shift+F5` to refresh code changes in the debugger window.
+2. Make sure you've got nodejs installed (and npm).
+3. Run `npm install` to install the plugin and development dependencies.
+4. Hit `F5` to build the plugin and open a new window for testing.
+5. Hit `cmd+shift+F5` to refresh code changes in the debugger window.
 
 ## Known Issues
 
