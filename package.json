@@ -85,8 +85,9 @@
 	"dependencies": {
 		"ascii-histogram": "^1.2.1",
 		"ascii-table": "0.0.9",
+		"aws-sdk": "^2.766.0",
 		"bars": "github:jstrace/bars",
 		"dataframe-js": "^1.4.3",
-		"aws-sdk": "^2.766.0"
+		"snowflake-sdk": "^1.5.3"
 	}
 }
