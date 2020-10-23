@@ -1,6 +1,4 @@
-import * as Snowflake from 'snowflake-sdk';
 import { DataFrame } from 'dataframe-js';
-import { wait } from "./utils";
 
 export function runSnowflakeQuery(query: string) {
     // Takes in a query and returns a DataFrame with the results.
