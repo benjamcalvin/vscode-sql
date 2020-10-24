@@ -1,33 +1,22 @@
 import { DataFrame } from 'dataframe-js';
 
-export function runSnowflakeQuery(query: string) {
+export async function runSnowflakeQuery(connection, query: string) {
     // Takes in a query and returns a DataFrame with the results.
-    let account = process.env.SNOWFLAKE_ACCOUNT
-    let user = process.env.SNOWFLAKE_USER
-    let password = process.env.SNOWFLAKE_PASSWORD
-
-    let connection = createConnection(account, user, password)
-    let startQueryExecutionResponse = getQueryResults(connection, query)
-    const queryExecutionId = startQueryExecutionResponse['QueryExecutionId']
 
     var getQueryResultsResponse;
-    getQueryResultsResponse =  getQueryResults(connection, queryExecutionId).catch(function (err) {
-        console.log(err.message);
-        return err.message
-    });
-    console.log(getQueryResultsResponse);
+    getQueryResultsResponse = getQueryResults(connection, query)
 
     let values: any;
-    if (typeof (getQueryResultsResponse) != 'string') {
-        const resultSet = getQueryResultsResponse['ResultSet'];
-        // console.log(resultSet)
+    if (getQueryResultsResponse) {
+        const resultSet = getQueryResultsResponse;
+        console.log(resultSet)
         const rows = resultSet['Rows'];
-        // console.log(rows)
+        console.log(rows)
         values = unpackRows(rows);
-        // console.log(values)
+        console.log(values)
         var df = new DataFrame(values[1], values[0]);
     } else {
-        values = getQueryResultsResponse;
+        console.log("no data");
     }
 
     return values
@@ -35,7 +24,7 @@ export function runSnowflakeQuery(query: string) {
 }
 
 
-function createConnection(account, user, password) {
+export function createConnection(account, user, password) {
     var snowflake = require('snowflake-sdk');
     // Create a Connection object that we can use later to connect.
     var connection = snowflake.createConnection({
@@ -54,12 +43,14 @@ function createConnection(account, user, password) {
             else {
                 console.log('Successfully connected to Snowflake.');
                 // Optional: store the connection ID.
-                connection_ID = conn.getId();
+                var connection_ID = conn.getId();
             }
         }
     );
 
+    return connection
 }
+
 
 function getQueryResults(connection, query: string) {
     var statement = connection.execute({
@@ -69,10 +60,11 @@ function getQueryResults(connection, query: string) {
                 console.error('Failed to execute statement due to the following error: ' + err.message);
             } else {
                 console.log('Successfully executed statement')
-                return stmt.getSqlText().promise();
+                console.log(stmt.getSqlText())
             }
         }
     });
+    return statement
 }
 
 

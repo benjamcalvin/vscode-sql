@@ -12,7 +12,8 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:vscode-sql.executeSQLTable",
+        "onCommand:vscode-sql.executeSQLTable",
+        "onCommand:vscode-sql.executeSnowflake",
 		"onCommand:vscode-sql.executeSQLHistogram",
 		"onCommand:vscode-sql.getTables",
 		"onCommand:vscode-sql.findColumn",
@@ -23,7 +24,11 @@
 		"commands": [
 			{
 				"command": "vscode-sql.executeSQLTable",
-				"title": "VS-SQL: Execute SQL (Table)"
+				"title": "VS-SQL: Execute Athena SQL (Table)"
+            },
+            {
+				"command": "vscode-sql.executeSnowflake",
+				"title": "VS-SQL: Execute Snowflake SQL (Table)"
 			},
 			{
 				"command": "vscode-sql.executeSQLHistogram",
@@ -88,6 +93,7 @@
 		"aws-sdk": "^2.766.0",
 		"bars": "github:jstrace/bars",
 		"dataframe-js": "^1.4.3",
+		"process": "^0.11.10",
 		"snowflake-sdk": "^1.5.3"
 	}
 }
