@@ -12,8 +12,8 @@
 		"Other"
 	],
 	"activationEvents": [
-        "onCommand:vscode-sql.executeSQLTable",
-        "onCommand:vscode-sql.executeSnowflake",
+		"onCommand:vscode-sql.executeSQLTable",
+		"onCommand:vscode-sql.executeSnowflake",
 		"onCommand:vscode-sql.executeSQLHistogram",
 		"onCommand:vscode-sql.getTables",
 		"onCommand:vscode-sql.findColumn",
@@ -25,8 +25,8 @@
 			{
 				"command": "vscode-sql.executeSQLTable",
 				"title": "VS-SQL: Execute Athena SQL (Table)"
-            },
-            {
+			},
+			{
 				"command": "vscode-sql.executeSnowflake",
 				"title": "VS-SQL: Execute Snowflake SQL (Table)"
 			},

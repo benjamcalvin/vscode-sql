@@ -4,7 +4,9 @@ export async function runSnowflakeQuery(connection, query: string) {
     // Takes in a query and returns a DataFrame with the results.
 
     var getQueryResultsResponse;
-    getQueryResultsResponse = getQueryResults(connection, query)
+    getQueryResultsResponse = await getQueryResults(connection, query)
+
+    console.log(getQueryResultsResponse)
 
     let values: any;
     if (getQueryResultsResponse) {
