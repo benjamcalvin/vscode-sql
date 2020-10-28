@@ -43,7 +43,7 @@ async function runSQLTable(database) {
 			}
 		})
 
-		var results: DataFrame[] = [];
+		// var results: DataFrame[] = [];
 		for (var i = 0; i < n_queries; i++) {
 			// This expects a tuple of results [columns, values] where columns is
 			// a 1-dimensional array of column names and values is a 2-dimensional
@@ -51,14 +51,14 @@ async function runSQLTable(database) {
             // if (database === 'Athena'){
             //     results.push(await runAthenaQuery(queries[i].text));
             // }else if (database === 'Snowflake'){
-            results.push(await runSnowflakeQuery(connection, queries[i].text));
+            const df = await runSnowflakeQuery(connection, queries[i].text);
             // }else{
             //     console.log("error")
             // }
 			editor.edit(editBuilder => {
 				editBuilder.replace(
 					queries[i].getTimestampSelection(),
-					queries[i].format_table(results[i])
+					queries[i].format_table(df)
 				)
 			})
 		}

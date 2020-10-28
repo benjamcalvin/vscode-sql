@@ -5,9 +5,7 @@ import { resolve } from 'dns';
 export async function runSnowflakeQuery(connection, query: string) {
     // Takes in a query and returns a DataFrame with the results.
     var getQueryResultsResponse = await getQueryResults(connection, query)
-
-    console.log("OUTSIDE")
-    console.log(getQueryResultsResponse)
+    // console.log(getQueryResultsResponse)
 
     return getQueryResultsResponse
 }
