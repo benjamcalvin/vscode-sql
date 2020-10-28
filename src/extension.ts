@@ -48,14 +48,13 @@ async function runSQLTable(database) {
 			// This expects a tuple of results [columns, values] where columns is
 			// a 1-dimensional array of column names and values is a 2-dimensional
             // array of rows, and columns respectively.
-            if (database === 'Athena'){
-                results.push(await runAthenaQuery(queries[i].text));
-            }else if (database === 'Snowflake'){
-                results.push(await runSnowflakeQuery(connection, queries[i].text));
-            }else{
-                console.log("error")
-            }
-			results.push(await runSnowflakeQuery(connection, queries[i].text));
+            // if (database === 'Athena'){
+            //     results.push(await runAthenaQuery(queries[i].text));
+            // }else if (database === 'Snowflake'){
+            results.push(await runSnowflakeQuery(connection, queries[i].text));
+            // }else{
+            //     console.log("error")
+            // }
 			editor.edit(editBuilder => {
 				editBuilder.replace(
 					queries[i].getTimestampSelection(),

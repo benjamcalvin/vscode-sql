@@ -1,28 +1,15 @@
+import { rejects } from 'assert';
 import { DataFrame } from 'dataframe-js';
+import { resolve } from 'dns';
 
 export async function runSnowflakeQuery(connection, query: string) {
     // Takes in a query and returns a DataFrame with the results.
+    var getQueryResultsResponse = await getQueryResults(connection, query)
 
-    var getQueryResultsResponse;
-    getQueryResultsResponse = await getQueryResults(connection, query)
-
+    console.log("OUTSIDE")
     console.log(getQueryResultsResponse)
 
-    let values: any;
-    if (getQueryResultsResponse) {
-        const resultSet = getQueryResultsResponse;
-        console.log(resultSet)
-        const rows = resultSet['Rows'];
-        console.log(rows)
-        values = unpackRows(rows);
-        console.log(values)
-        var df = new DataFrame(values[1], values[0]);
-    } else {
-        console.log("no data");
-    }
-
-    return values
-
+    return getQueryResultsResponse
 }
 
 
@@ -54,19 +41,21 @@ export function createConnection(account, user, password) {
 }
 
 
-function getQueryResults(connection, query: string) {
-    var statement = connection.execute({
-        sqlText: query,
-        complete: function (err, stmt, rows) {
+async function getQueryResults(connection, query: string) {
+    return await new Promise((res: any, rej: any) => {
+        connection.execute({
+            sqlText: query,
+            complete: (err, stmt, rows) => {
             if (err) {
                 console.error('Failed to execute statement due to the following error: ' + err.message);
+                rej(err)
             } else {
-                console.log('Successfully executed statement')
-                console.log(stmt.getSqlText())
+                console.log('Successfully executed statement: ' + stmt.getSqlText());
+                res(rows)
             }
-        }
-    });
-    return statement
+            }
+        });
+    })
 }
 
 
