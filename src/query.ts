@@ -64,6 +64,7 @@ export class Query {
             heading: values[0],
             rows: values[1]
         });
+        table.setBorder('|', '-', ' ', ' ');
 
         table = table.toString();
         table = table.split('\n');
