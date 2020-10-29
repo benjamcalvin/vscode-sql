@@ -56,7 +56,27 @@ export class Query {
     }
 
     format_table(values: any) {
-        console.log(values)
+        if (typeof(values) == 'string') {
+            return values;
+        }
+
+        var table = new AsciiTable.factory({
+            heading: values[0],
+            rows: values[1]
+        });
+
+        table = table.toString();
+        table = table.split('\n');
+        var cleaned_table = [];
+        for (var i = 1; i < table.length - 1; i++) {
+            if (i != 2) {
+                cleaned_table.push(table[i].substring(1, table[i].length - 2));
+            }
+        }
+        return cleaned_table.join("\n")
+    }
+
+    format_df_table(values: any) {
         if (typeof(values) == 'string') {
             return values;
         }
@@ -68,27 +88,12 @@ export class Query {
         });
 
         const keys = Object.keys(values[0]);
-        // var table = new AsciiTable.factory({
-        //     heading: values[0],
-        //     rows: values[1]
-        // });
-        console.log(arr)
         var table = new AsciiTable()
         table.addRowMatrix(arr)
         table.setHeading(keys)
         table.setBorder('|', '-', ' ', ' ');
 
         return table.render()
-
-        // table = table.toString();
-        // table = table.split('\n');
-        // var cleaned_table = [];
-        // for (var i = 1; i < table.length - 1; i++) {
-        //     if (i != 2) {
-        //         cleaned_table.push(table[i].substring(1, table[i].length - 2));
-        //     }
-        // }
-        // return cleaned_table.join("\n")
     }
 
     format_histogram(values: any) {

@@ -20,8 +20,7 @@ let password = process.env.SNOWFLAKE_PASSWORD
 
 let connection = createConnection(account, user, password)
 
-async function runSQLTable(database) {
-
+async function runSQLTable() {
 	// Get active text editor
 	let editor = vscode.window.activeTextEditor;
 
@@ -43,24 +42,31 @@ async function runSQLTable(database) {
 			}
 		})
 
-		// var results: DataFrame[] = [];
+		var results: DataFrame[] = [];
 		for (var i = 0; i < n_queries; i++) {
 			// This expects a tuple of results [columns, values] where columns is
 			// a 1-dimensional array of column names and values is a 2-dimensional
             // array of rows, and columns respectively.
-            // if (database === 'Athena'){
-            //     results.push(await runAthenaQuery(queries[i].text));
-            // }else if (database === 'Snowflake'){
-            const df = await runSnowflakeQuery(connection, queries[i].text);
-            // }else{
-            //     console.log("error")
-            // }
-			editor.edit(editBuilder => {
-				editBuilder.replace(
-					queries[i].getTimestampSelection(),
-					queries[i].format_table(df)
-				)
-			})
+            if (this['database'] == 'Athena'){
+                results.push(await runAthenaQuery(queries[i].text));
+                editor.edit(editBuilder => {
+                    editBuilder.replace(
+                        queries[i].getTimestampSelection(),
+                        queries[i].format_table(results[i])
+                    )
+                })
+            }else if (this['database'] == 'Snowflake'){
+                results.push(await runSnowflakeQuery(connection, queries[i].text));
+                console.log(results)
+                editor.edit(editBuilder => {
+                    editBuilder.replace(
+                        queries[i].getTimestampSelection(),
+                        queries[i].format_df_table(results[i])
+                    )
+                })
+            }else{
+                console.log("error – not a valid database")
+            }
 		}
 	}
 
@@ -193,8 +199,8 @@ export async function activate(context: vscode.ExtensionContext) {
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with registerCommand
 	// The commandId parameter must match the command field in package.json
-    let disposable_table = vscode.commands.registerCommand('vscode-sql.executeSQLTable', runSQLTable, 'Athena');
-    let disposable_table_snowflake = vscode.commands.registerCommand('vscode-sql.executeSnowflake', runSQLTable, 'Snowflake');
+    let disposable_table = vscode.commands.registerCommand('vscode-sql.executeSQLTable', runSQLTable, {'database':'Athena'});
+    let disposable_table_snowflake = vscode.commands.registerCommand('vscode-sql.executeSnowflake', runSQLTable, {'database':'Snowflake'});
 	let disposable_histogram = vscode.commands.registerCommand('vscode-sql.executeSQLHistogram', runSQLHistogram);
 	let disposable_tables = vscode.commands.registerCommand('vscode-sql.getTables', getTables)
 	let disposable_find_column = vscode.commands.registerCommand('vscode-sql.findColumn', findColumn)
