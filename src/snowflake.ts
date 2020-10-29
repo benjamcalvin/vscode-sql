@@ -66,32 +66,3 @@ function terminateConnection(connection) {
         }
     });
 }
-
-
-function unpackRows(rows: any) {
-    var string = "";
-    let values: any[] = [];
-    let columns: any[] = [];
-    for (var i = 0; i < rows.length; i++) {
-        if (i == 0) {
-            columns = unpackRow(rows[i]);
-        } else {
-            string = string + unpackRow(rows[i]) + "\n";
-            values.push(unpackRow(rows[i]));
-        }
-    }
-
-    return [columns, values]
-};
-
-
-function unpackRow(row: any) {
-    var row = row['Data']
-    var values = []
-    var string = "";
-    for (var j = 0; j < row.length; j++) {
-        string = string + row[j]['VarCharValue'] + ", ";
-        values.push(row[j]['VarCharValue']);
-    };
-    return values
-};
