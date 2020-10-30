@@ -13,12 +13,16 @@ AWS.config.update({
 	region: 'us-east-1'
 });
 
-const process = require('process');
-let account = process.env.SNOWFLAKE_ACCOUNT
-let user = process.env.SNOWFLAKE_USER
-let password = process.env.SNOWFLAKE_PASSWORD
+let snowflakeConnection = null
 
-let connection = createConnection(account, user, password)
+async function connectToSnowflake() {
+    const process = require('process');
+    let account = process.env.SNOWFLAKE_ACCOUNT
+    let user = process.env.SNOWFLAKE_USER
+    let password = process.env.SNOWFLAKE_PASSWORD
+
+    snowflakeConnection = createConnection(account, user, password)
+}
 
 async function runSQLTable() {
 	// Get active text editor
@@ -56,7 +60,7 @@ async function runSQLTable() {
                     )
                 })
             }else if (this['database'] == 'Snowflake'){
-                results.push(await runSnowflakeQuery(connection, queries[i].text));
+                results.push(await runSnowflakeQuery(snowflakeConnection, queries[i].text));
                 console.log(results)
                 editor.edit(editBuilder => {
                     editBuilder.replace(
@@ -204,7 +208,8 @@ export async function activate(context: vscode.ExtensionContext) {
 	let disposable_histogram = vscode.commands.registerCommand('vscode-sql.executeSQLHistogram', runSQLHistogram);
 	let disposable_tables = vscode.commands.registerCommand('vscode-sql.getTables', getTables)
 	let disposable_find_column = vscode.commands.registerCommand('vscode-sql.findColumn', findColumn)
-	let disposable_get_columns = vscode.commands.registerCommand('vscode-sql.getColumns', getColumns)
+    let disposable_get_columns = vscode.commands.registerCommand('vscode-sql.getColumns', getColumns)
+    let disposable_table_snowflake_connection = vscode.commands.registerCommand('vscode-sql.connectToSnowflake', connectToSnowflake)
 
 
     context.subscriptions.push(disposable_table);
@@ -212,7 +217,8 @@ export async function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(disposable_histogram);
 	context.subscriptions.push(disposable_tables);
 	context.subscriptions.push(disposable_find_column);
-	context.subscriptions.push(disposable_get_columns);
+    context.subscriptions.push(disposable_get_columns);
+    context.subscriptions.push(disposable_table_snowflake_connection);
 }
 
 // this method is called when your extension is deactivated

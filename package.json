@@ -17,7 +17,8 @@
 		"onCommand:vscode-sql.executeSQLHistogram",
 		"onCommand:vscode-sql.getTables",
 		"onCommand:vscode-sql.findColumn",
-		"onCommand:vscode-sql.getColumns"
+        "onCommand:vscode-sql.getColumns",
+        "onCommand:vscode-sql.connectToSnowflake"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -45,6 +46,10 @@
 			{
 				"command": "vscode-sql.getColumns",
 				"title": "VS-SQL: List All Columns"
+            },
+            {
+				"command": "vscode-sql.connectToSnowflake",
+				"title": "VS-SQL: Connect To Snowflake"
 			}
 		],
 		"keybindings": [
