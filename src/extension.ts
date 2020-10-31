@@ -4,8 +4,9 @@ import * as vscode from 'vscode';
 import * as AWS from 'aws-sdk';
 import { DataFrame } from 'dataframe-js';
 import { listColumns, listDatabases, listTables, runAthenaQuery } from './athena';
+import { runPostgresQuery } from './postgres';
 import { Query } from './query';
-import { parse_queries } from './utils';
+import { parse_queries, getCurrentDbType } from './utils';
 import { countReset } from 'console';
 
 AWS.config.update({
@@ -41,7 +42,13 @@ async function runSQLTable() {
 			// a 1-dimensional array of column names and values is a 2-dimensional
 			// array of rows, and columns respectively.
 
-			results.push(await runAthenaQuery(queries[i].text));
+			const currentDbType = getCurrentDbType()
+			if (currentDbType == 'postgres') {
+				results.push(await runPostgresQuery(queries[i].text));
+			} else {
+				results.push(await runAthenaQuery(queries[i].text));
+			}
+			
 			editor.edit(editBuilder => {
 				editBuilder.replace(
 					queries[i].getTimestampSelection(),
@@ -80,7 +87,12 @@ async function runSQLHistogram() {
 			// This expects a tuple of results [columns, values] where columns is
 			// a 1-dimensional array of column names and values is a 2-dimensional
 			// array of rows, and columns respectively.
-			results.push(await runAthenaQuery(queries[i].text));
+			const currentDbType = getCurrentDbType()
+			if (currentDbType == 'postgres') {
+				results.push(await runPostgresQuery(queries[i].text));
+			} else {
+				results.push(await runAthenaQuery(queries[i].text));
+			}
 
 			editor.edit(editBuilder => {
 				editBuilder.replace(

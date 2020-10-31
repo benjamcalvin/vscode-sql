@@ -1,3 +1,7 @@
+import fs = require('fs');
+import path = require('path');
+
+
 export function wait(ms: number){
     // Synchronous wait for a number of milliseconds.
 	var start = new Date().getTime();
@@ -37,4 +41,18 @@ export function parse_queries(query: string) {
 	}
 
 	return parsed_queries
+}
+
+export function getDbJson() {
+	const filePath = path.join(__dirname, '../db_creds.json')
+	const dbJson = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+
+	return dbJson
+}
+
+export function getCurrentDbType() {
+	const dbJson = getDbJson()
+	const currentDb = dbJson['current_db']
+
+	return dbJson['dbs'][currentDb]['type']
 }
