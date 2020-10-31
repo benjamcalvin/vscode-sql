@@ -32,6 +32,12 @@ SELECT 'women', 'age 50-75', 222
 
 ```
 
+## Credentials
+Fill out DB credentials in the `db_creds.json` and select one
+database as the `default_db`. vscode-sql will use it for all commands.
+
+**DO NOT commit, push to git or share your credentials**
+
 ## Installation
 
 1. Navigate to release and download the latest release.
