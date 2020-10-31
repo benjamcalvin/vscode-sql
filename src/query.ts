@@ -33,7 +33,7 @@ export class Query {
 		const n_chars = lines[n_lines - 1].length;
 		this.endPosition = new vscode.Position(n_lines - 1, n_chars + 1);
 
-		// Get timestamp: 
+		// Get timestamp:
 		this.timestamp = current_timestamp(this.query_num);
 
 	}
@@ -56,7 +56,6 @@ export class Query {
     }
 
     format_table(values: any) {
-
         if (typeof(values) == 'string') {
             return values;
         }
@@ -66,7 +65,7 @@ export class Query {
             rows: values[1]
         });
         table.setBorder('|', '-', ' ', ' ');
-    
+
         table = table.toString();
         table = table.split('\n');
         var cleaned_table = [];
@@ -76,6 +75,26 @@ export class Query {
             }
         }
         return cleaned_table.join("\n")
+    }
+
+    format_df_table(values: any) {
+        if (typeof(values) == 'string') {
+            return values;
+        }
+
+        var arr = values.map(function(inp) {
+            return Object.keys(inp).map(function(key) {
+              return inp[key];
+            })
+        });
+
+        const keys = Object.keys(values[0]);
+        var table = new AsciiTable()
+        table.addRowMatrix(arr)
+        table.setHeading(keys)
+        table.setBorder('|', '-', ' ', ' ');
+
+        return table.render()
     }
 
     format_histogram(values: any) {
@@ -93,7 +112,7 @@ export class Query {
             console.log("N rows", contents.length);
 
             var bar_contents: any = {};
-            
+
             for (var i = 0; i < contents.length; i++ ) {
                 console.log(i)
                 console.log(contents[i])
@@ -108,8 +127,8 @@ export class Query {
             return err.stack
         }
     }
-    
-    
+
+
 
 
 }

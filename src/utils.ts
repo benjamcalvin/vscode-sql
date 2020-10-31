@@ -13,7 +13,7 @@ export function current_timestamp(query_num: number) {
 }
 
 export function trim_query(query: string) {
-	const query_start_regex = /[Ss][Ee][Ll][Ee][Cc][Tt]/;
+	const query_start_regex = /[Ss][Ee][Ll][Ee][Cc][Tt]|[Uu][Ss][Ee]/;
 	var query_start = query.search(query_start_regex);
 	return query.substring(query_start);
 }
@@ -21,15 +21,15 @@ export function trim_query(query: string) {
 
 export function parse_queries(query: string) {
 	// Parses query and returns list of queries to be executed.
-	
+
 	var queries = query.split(';');
 	var parsed_queries = [];
-	const query_start_regex = /[Ss][Ee][Ll][Ee][Cc][Tt]/;
+	const query_start_regex = /[Ss][Ee][Ll][Ee][Cc][Tt]|[Uu][Ss][Ee]/;
 
 	for (var i = 0; i < queries.length; i++) {
 
 		var query_start = queries[i].search(query_start_regex);
-		
+
 		console.log(query_start);
 		if (query_start >= 0) {
 			parsed_queries.push(queries[i].substring(query_start));

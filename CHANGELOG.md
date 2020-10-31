@@ -7,3 +7,13 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [Unreleased]
 
 - Initial release
+
+## [0.1.0] - 2020-10-28
+### Added
+- Ability to query Snowflake [@iflores12](https://github.com/iflores12).
+- Broke out Athena into own command.
+- Added ability to create tables from DFs.
+
+### Need To Add
+- Histogram for Snowflake
+- Table look up for Snowflake

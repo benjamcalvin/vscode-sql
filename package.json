@@ -13,17 +13,23 @@
 	],
 	"activationEvents": [
 		"onCommand:vscode-sql.executeSQLTable",
+		"onCommand:vscode-sql.executeSnowflake",
 		"onCommand:vscode-sql.executeSQLHistogram",
 		"onCommand:vscode-sql.getTables",
 		"onCommand:vscode-sql.findColumn",
-		"onCommand:vscode-sql.getColumns"
+        "onCommand:vscode-sql.getColumns",
+        "onCommand:vscode-sql.connectToSnowflake"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
 			{
 				"command": "vscode-sql.executeSQLTable",
-				"title": "VS-SQL: Execute SQL (Table)"
+				"title": "VS-SQL: Execute Athena SQL (Table)"
+			},
+			{
+				"command": "vscode-sql.executeSnowflake",
+				"title": "VS-SQL: Execute Snowflake SQL (Table)"
 			},
 			{
 				"command": "vscode-sql.executeSQLHistogram",
@@ -40,6 +46,10 @@
 			{
 				"command": "vscode-sql.getColumns",
 				"title": "VS-SQL: List All Columns"
+            },
+            {
+				"command": "vscode-sql.connectToSnowflake",
+				"title": "VS-SQL: Connect To Snowflake"
 			}
 		],
 		"keybindings": [
@@ -85,8 +95,10 @@
 	"dependencies": {
 		"ascii-histogram": "^1.2.1",
 		"ascii-table": "0.0.9",
+		"aws-sdk": "^2.766.0",
 		"bars": "github:jstrace/bars",
 		"dataframe-js": "^1.4.3",
-		"aws-sdk": "^2.766.0"
+		"process": "^0.11.10",
+		"snowflake-sdk": "^1.5.3"
 	}
 }
