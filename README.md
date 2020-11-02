@@ -65,6 +65,19 @@ For more information, see: https://code.visualstudio.com/api/working-with-extens
 4. Hit `F5` to build the plugin and open a new window for testing.
 5. Hit `cmd+shift+F5` to refresh code changes in the debugger window.
 
+### Adding Support for other Databases
+To add support for other databases:
+1. Create a new file `myDb.ts`
+2. This file should contain the following 4 functions with the appropriate return types.
+   See `athena.ts` or `postgres.ts` for example.
+	- runQueryMyDb
+	- listSchemasMyDb
+	- listTablesMyDb
+	- listColumnsMyDb
+3. Add your myDb functions to `db_selection.ts` using if statements
+4. Add an EMPTY template for the expected db creds, and db type to `db_creds.json`.
+   DO NOT include any actual credentials
+
 ## Known Issues
 
 ### Leaving the Tab
