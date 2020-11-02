@@ -1,7 +1,7 @@
 import { Client } from 'ts-postgres';
 import { getDbJson } from './utils';
 
-export async function runPostgresQuery(query: string) {
+export async function runQueryPostgres(query: string) {
     // Takes in a query and returns a list of [column_names, result].
     // column_names: list of string
     // result: return table as a 2D array
@@ -32,26 +32,26 @@ export async function runPostgresQuery(query: string) {
     return values
 }
 
-export async function listDatabases() {
+export async function listSchemasPostgres() {
     const query = "SELECT nspname FROM pg_namespace ORDER BY 1;"
-    const results = await runPostgresQuery(query);
+    const results = await runQueryPostgres(query);
     return getNthColumn(results[1], 0)
 }
 
-export async function listTables(databaseName: string) {
+export async function listTablesPostgres(schema: string) {
     const query = `SELECT table_name FROM information_schema.tables
-        WHERE table_schema = '${databaseName}'
+        WHERE table_schema = '${schema}'
         ORDER BY 1;`
-    const results = await runPostgresQuery(query);
+    const results = await runQueryPostgres(query);
     return getNthColumn(results[1], 0)
 }
 
-export async function listColumns(database: string, table: string) {
+export async function listColumnsPostgres(schema: string, table: string) {
     const query = `SELECT column_name FROM information_schema.columns
-        WHERE table_schema = '${database}'
+        WHERE table_schema = '${schema}'
         AND table_name = '${table}'
         ORDER BY 1;`
-    const results = await runPostgresQuery(query);
+    const results = await runQueryPostgres(query);
     return getNthColumn(results[1], 0)
 }
 
