@@ -10,8 +10,9 @@ import {
 	getListColumnsFunction,
 	getListTablesFunction,
 	getListDatabasesFunction
-} from './db_selection';
-import { countReset } from 'console';
+} from './db-selection';
+import { selectActiveConn, addConn, deleteConn } from './connection'
+
 
 AWS.config.update({
 	region: 'us-east-1'
@@ -195,13 +196,19 @@ export async function activate(context: vscode.ExtensionContext) {
 	let disposable_tables = vscode.commands.registerCommand('vscode-sql.getTables', getTables)
 	let disposable_find_column = vscode.commands.registerCommand('vscode-sql.findColumn', findColumn)
 	let disposable_get_columns = vscode.commands.registerCommand('vscode-sql.getColumns', getColumns)
-
+	let disposable_select_active_connection = vscode.commands.registerCommand('vscode-sql.selectActiveConnection', selectActiveConn)
+	let disposable_add_connection = vscode.commands.registerCommand('vscode-sql.addConnection', addConn)
+	let disposable_delete_connection = vscode.commands.registerCommand('vscode-sql.deleteConnection', deleteConn)
 
 	context.subscriptions.push(disposable_table);
 	context.subscriptions.push(disposable_histogram);
 	context.subscriptions.push(disposable_tables);
 	context.subscriptions.push(disposable_find_column);
 	context.subscriptions.push(disposable_get_columns);
+	context.subscriptions.push(disposable_select_active_connection);
+	context.subscriptions.push(disposable_add_connection);
+	context.subscriptions.push(disposable_delete_connection);
+
 }
 
 // this method is called when your extension is deactivated
