@@ -1,22 +1,14 @@
 import { Client } from 'ts-postgres';
-import { getDbJson } from './utils';
+import { getNthColumn } from './utils';
+import { getPostgresParams } from './connection'
 
 export async function runQueryPostgres(query: string) {
     // Takes in a query and returns a list of [column_names, result].
     // column_names: list of string
     // result: return table as a 2D array
 
-    const dbJson = getDbJson()
-    const currentDb = dbJson['current_db']
-    const dbConfig = dbJson['dbs'][currentDb]
-
-    const client = new Client({
-        "host": dbConfig['host'],
-        "port": dbConfig['port'],
-        "database": dbConfig['database'],
-        "user": dbConfig['user'],
-        "password": dbConfig['password'],
-    });
+    const connParams = getPostgresParams()
+    const client = new Client(connParams);
     await client.connect();
 
     var values: any;
@@ -28,7 +20,6 @@ export async function runQueryPostgres(query: string) {
     } finally {
         await client.end();
     }
-
     return values
 }
 
@@ -53,13 +44,4 @@ export async function listColumnsPostgres(schema: string, table: string) {
         ORDER BY 1;`
     const results = await runQueryPostgres(query);
     return getNthColumn(results[1], 0)
-}
-
-function getNthColumn(table: any, n: number) {
-    var col = [];
-    for (var i = 0; i < table.length; i++) {
-        col.push(table[i][n])
-    }
-
-    return col
 }
