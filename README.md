@@ -31,12 +31,8 @@ SELECT 'women', 'age 50-75', 222
   women age 50-75 | ###############################                              | 222
 
 ```
-
-## Credentials
-Fill out DB credentials in the `db_creds.json` and select one
-database as the `default_db`. vscode-sql will use it for all commands.
-
-**DO NOT commit, push to git or share your credentials**
+## Database Connections
+TODO: add gif
 
 ## Installation
 
@@ -74,9 +70,8 @@ To add support for other databases:
 	- listSchemasMyDb
 	- listTablesMyDb
 	- listColumnsMyDb
-3. Add your myDb functions to `db_selection.ts` using if statements
-4. Add an EMPTY template for the expected db creds, and db type to `db_creds.json`.
-   DO NOT include any actual credentials
+3. Add your myDb functions to `db-selection.ts` using if statements
+4. Add new database type to `connection.ts`
 
 ## Known Issues
 
@@ -121,6 +116,13 @@ RangeError: Invalid array length
 	at processTicksAndRejections (internal/process/task_queues.js:94:5)
 
 ```
+
+### BigQuery findColumn
+Using the `findColumn` command (`cmd+shift+c`) actually sends a query to
+`INFORMATION_SCHEMA.COLUMNS`. Each execution counts as one query toward your
+billing quotas. The size of the query is quite negligible - on the order of a few MBs.
+
+Running `getTables` (`cmd+shift+t`) does not count toward billing quotas.
 
 ## Release Notes
 
