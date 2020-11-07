@@ -1,6 +1,7 @@
 // Functions for getting or adding database connection
 
 import * as vscode from 'vscode';
+import CryptoTS = require("crypto-ts");
 
 const CONN_TYPE = [
     'athena',
@@ -49,6 +50,10 @@ export function getPostgresParams() {
         dbConnParams[key] = vscode.workspace.getConfiguration(`vscodeSql.connections.${activeConn}`).get(key)
     }
     
+    const decryptedValue = CryptoTS.AES.decrypt(dbConnParams['password'], 'eachstuffamountproof').toString(CryptoTS.enc.Utf8)
+    dbConnParams['password'] = decryptedValue
+    console.log(decryptedValue)
+
     // console.log('conn params', dbConnParams)
     return dbConnParams
 }
@@ -64,7 +69,10 @@ export async function selectActiveConn() {
     const connIds = getConnections()
     const selectedConnId = await vscode.window.showQuickPick(
         connIds,
-        { placeHolder: 'Select active connection.' }
+        {
+            placeHolder: 'Select active connection.',
+            ignoreFocusOut: true
+        }
     )
 
     await vscode.workspace.getConfiguration('vscodeSql').update(
@@ -82,7 +90,10 @@ export async function addConn() {
 
     const connType = await vscode.window.showQuickPick(
         CONN_TYPE,
-        { placeHolder: 'Select connection type' }
+        {
+            placeHolder: 'Select connection type',
+            ignoreFocusOut: true
+        }
     )
 
     var connection = {
@@ -93,9 +104,16 @@ export async function addConn() {
         for (let key of POSTGRES_PARAMS) {
             let value = await vscode.window.showInputBox({
                 placeHolder: `Enter ${key}`,
+                ignoreFocusOut: true,
                 password: key == 'password'
             })
-            connection[key] = value
+            if (key == 'password') {
+                // 4 random words
+                const encryptedvalue = CryptoTS.AES.encrypt(value, 'eachstuffamountproof').toString();
+                connection[key] = encryptedvalue
+            } else {
+                connection[key] = value
+            }
         }
     }
 
@@ -115,7 +133,10 @@ export async function deleteConn() {
     const connIds = getConnections()
     const selectedConnId = await vscode.window.showQuickPick(
         connIds,
-        { placeHolder: 'Select connection to delete.' }
+        {
+            placeHolder: 'Select connection to delete.',
+            ignoreFocusOut: true
+        }
     )
     
     const curConnections = getAllConns();
