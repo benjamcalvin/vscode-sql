@@ -6,10 +6,10 @@ import { DataFrame } from 'dataframe-js';
 import { Query } from './query';
 import { parse_queries } from './utils';
 import {
-	getRunQueryFunction,
-	getListColumnsFunction,
-	getListTablesFunction,
-	getListDatabasesFunction
+	runQuery,
+	listDatabases,
+	listTables,
+	listColumns
 } from './db-selection';
 import { selectActiveConn, addConn, deleteConn } from './connection'
 
@@ -17,11 +17,6 @@ import { selectActiveConn, addConn, deleteConn } from './connection'
 AWS.config.update({
 	region: 'us-east-1'
 });
-
-const runQuery = getRunQueryFunction();
-const listDatabases = getListDatabasesFunction();
-const listTables = getListTablesFunction();
-const listColumns = getListColumnsFunction();
 
 async function runSQLTable() {
 

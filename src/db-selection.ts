@@ -6,46 +6,46 @@ import { listColumnsAthena, listTablesAthena, listDatabasesAthena, runQueryAthen
 import { listColumnsPostgres, listTablesPostgres, listSchemasPostgres, runQueryPostgres } from './postgres';
 import { listColumnsBigquery, listTablesBigquery, listDatasetsBigquery, runQueryBigquery } from './bigquery';
 
-export function getRunQueryFunction() {
+export function runQuery(query: string) {
     const activeConnType = getActiveConnType()
     if ((activeConnType == 'postgres') || (activeConnType == 'redshift')) {
-        return runQueryPostgres;
+        return runQueryPostgres(query);
     } else if (activeConnType == 'bigquery') {
-        return runQueryBigquery;
+        return runQueryBigquery(query);
     } else {
-        return runQueryAthena;
+        return runQueryAthena(query);
     }
 }
 
-export function getListColumnsFunction() {
+export function listColumns(schema: string, table: string) {
     const activeConnType = getActiveConnType()
     if ((activeConnType == 'postgres') || (activeConnType == 'redshift')) {
-        return listColumnsPostgres;
+        return listColumnsPostgres(schema, table);
     } else if (activeConnType == 'bigquery') {
-        return listColumnsBigquery;
+        return listColumnsBigquery(schema, table);
     } else {
-        return listColumnsAthena;
+        return listColumnsAthena(schema, table);
     }
 }
 
-export function getListTablesFunction() {
+export function listTables(schema: string) {
     const activeConnType = getActiveConnType()
     if ((activeConnType == 'postgres') || (activeConnType == 'redshift')) {
-        return listTablesPostgres;
+        return listTablesPostgres(schema);
     } else if (activeConnType == 'bigquery') {
-        return listTablesBigquery;
+        return listTablesBigquery(schema);
     } else {
-        return listTablesAthena;
+        return listTablesAthena(schema);
     }
 }
 
-export function getListDatabasesFunction() {
+export function listDatabases() {
     const activeConnType = getActiveConnType()
     if ((activeConnType == 'postgres') || (activeConnType == 'redshift')) {
-        return listSchemasPostgres;
+        return listSchemasPostgres();
     } else if (activeConnType == 'bigquery') {
-        return listDatasetsBigquery;
+        return listDatasetsBigquery();
     } else {
-        return listDatabasesAthena;
+        return listDatabasesAthena();
     }
 }
