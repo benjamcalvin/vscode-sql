@@ -49,10 +49,7 @@ export function getPostgresParams() {
     for (let key of POSTGRES_PARAMS) {
         dbConnParams[key] = vscode.workspace.getConfiguration(`vscodeSql.connections.${activeConn}`).get(key)
     }
-    
-    const decryptedValue = CryptoTS.AES.decrypt(dbConnParams['password'], 'eachstuffamountproof').toString(CryptoTS.enc.Utf8)
-    dbConnParams['password'] = decryptedValue
-    console.log(decryptedValue)
+    dbConnParams['password'] = decrypt(dbConnParams['password'])
 
     // console.log('conn params', dbConnParams)
     return dbConnParams
@@ -108,9 +105,7 @@ export async function addConn() {
                 password: key == 'password'
             })
             if (key == 'password') {
-                // 4 random words
-                const encryptedvalue = CryptoTS.AES.encrypt(value, 'eachstuffamountproof').toString();
-                connection[key] = encryptedvalue
+                connection[key] = encrypt(value)
             } else {
                 connection[key] = value
             }
@@ -160,4 +155,13 @@ export async function deleteConn() {
     )
 
     await selectActiveConn()
+}
+
+function encrypt(s: string) {
+    // 4 random words
+    return CryptoTS.AES.encrypt(s, 'eachstuffamountproof').toString();
+}
+
+function decrypt(s: string) {
+    return CryptoTS.AES.decrypt(s, 'eachstuffamountproof').toString(CryptoTS.enc.Utf8)
 }
