@@ -17,6 +17,7 @@
 		"onCommand:vscode-sql.getTables",
 		"onCommand:vscode-sql.findColumn",
 		"onCommand:vscode-sql.getColumns",
+		"onCommand:vscode-sql.clearResults",
 		"onCommand:vscode-sql.selectActiveConnection",
 		"onCommand:vscode-sql.addConnection",
 		"onCommand:vscode-sql.deleteConnection"
@@ -39,6 +40,10 @@
 			{
 				"command": "vscode-sql.findColumn",
 				"title": "VS-SQL: Find Column"
+			},
+			{
+				"command": "vscode-sql.clearResults",
+				"title": "VS-SQL: Clear Results"
 			},
 			{
 				"command": "vscode-sql.getColumns",
@@ -73,6 +78,10 @@
 			{
 				"command": "vscode-sql.findColumn",
 				"key": "cmd+shift+c"
+			},
+			{
+				"command": "vscode-sql.clearResults",
+				"key": "cmd+shift+k"
 			}
 		],
 		"configuration": {

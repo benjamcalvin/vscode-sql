@@ -171,7 +171,22 @@ async function getColumns() {
 	}
 }
 
+async function clearResults() {
+	let editor = vscode.window.activeTextEditor;
+	let document = editor.document;
+	if (editor) {
+		const selection = editor.selection
+		const selectionText = document.getText(selection);
+		// do not remove comments when clearing results
+		const clearedResults = parse_queries(selectionText, true);
 
+		if (editor) {
+			editor.edit(editBuilder => {
+				editBuilder.replace(selection, clearedResults.join('\n\n'));
+			})
+		};	
+	}
+}
 
 
 
@@ -191,6 +206,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	let disposable_tables = vscode.commands.registerCommand('vscode-sql.getTables', getTables)
 	let disposable_find_column = vscode.commands.registerCommand('vscode-sql.findColumn', findColumn)
 	let disposable_get_columns = vscode.commands.registerCommand('vscode-sql.getColumns', getColumns)
+	let disposable_clear_results = vscode.commands.registerCommand('vscode-sql.clearResults', clearResults)
 	let disposable_select_active_connection = vscode.commands.registerCommand('vscode-sql.selectActiveConnection', selectActiveConn)
 	let disposable_add_connection = vscode.commands.registerCommand('vscode-sql.addConnection', addConn)
 	let disposable_delete_connection = vscode.commands.registerCommand('vscode-sql.deleteConnection', deleteConn)
@@ -200,6 +216,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(disposable_tables);
 	context.subscriptions.push(disposable_find_column);
 	context.subscriptions.push(disposable_get_columns);
+	context.subscriptions.push(disposable_clear_results);
 	context.subscriptions.push(disposable_select_active_connection);
 	context.subscriptions.push(disposable_add_connection);
 	context.subscriptions.push(disposable_delete_connection);

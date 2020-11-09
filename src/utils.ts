@@ -19,23 +19,42 @@ export function trim_query(query: string) {
 }
 
 
-export function parse_queries(query: string) {
+export function parse_queries(query: string, includeComments=false) {
 	// Parses query and returns list of queries to be executed.
+	// include comments in the list if includeComments is true
 	
-	var queries = query.split(';');
-	var parsed_queries = [];
-	const query_start_regex = new RegExp("([Ww][Ii][Tt][Hh][^;]+)|([De][Ee][Ll][Ee][Tt][Ee][^;]+)|([Cc][Oo][Pp][Yy][^;]+)|([Ii][Nn][Ss][Ee][Rr][Tt][^;]+)|([Uu][Pp][Dd][Aa][Tt][Ee][^;]+)|([gG][rR][aA][nN][tT][^;]+)|([aA][lL][tT][eE][rR][^;]+)|([dD][rR][oO][pP][^;]+)|([cC][rR][eE][aA][tT][eE][^;]+)|([sS][eE][lL][eE][cC][tT][^;]+)");
+	const commands = [
+		"select",
+		"drop",
+		"create",
+		"grant",
+		"update",
+		"alter",
+		"insert",
+		"copy",
+		"with",
+		"delete"
+	]
 
-	for (var i = 0; i < queries.length; i++) {
+	var patterns = []
 
-		var query_start = queries[i].search(query_start_regex);
-		
-		console.log(query_start);
-		if (query_start >= 0) {
-			parsed_queries.push(queries[i].substring(query_start));
-		}
+	// Use lazy quantifier ? to find the query ending as early as possible
+	// https://javascript.info/regexp-greedy-and-lazy
+	for (let cmd of commands) {
+		patterns.push(`(${cmd}.*?;)`)
 	}
 
+	if (includeComments) {
+		// single line comment
+		patterns.push("(--.*?\n)")
+		// multiline comment
+		patterns.push("(/\\*.*?\\*/)")
+	}
+	
+	// Regex flags: global (g), case insensitive(i), and include spaces/tabs/new lines (s)
+	const patternRegExp = new RegExp(patterns.join("|"), "gis")
+	const parsed_queries = query.match(patternRegExp)
+	// console.log(parsed_queries)
 	return parsed_queries
 }
 
