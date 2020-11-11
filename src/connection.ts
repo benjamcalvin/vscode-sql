@@ -18,6 +18,10 @@ const POSTGRES_PARAMS = [
     "password"
 ]
 
+// Create status bar item showing current active connection
+let myStatusBarItem: vscode.StatusBarItem
+configureStatusBar()
+
 function getActiveConn() {
     return vscode.workspace.getConfiguration('vscodeSql').get("activeConnection")
 }
@@ -28,11 +32,11 @@ function getAllConns() {
 
 function validateStr(s: string) {
     // Check if string only contains alphanumeric
-    let pattern = /^[0-9a-zA-Z]+$/
+    let pattern = /^[0-9a-zA-Z_]+$/
     if (s.match(pattern)) {
         return null
     } else {
-        return 'Only alphanumeric allowed'
+        return 'Only alphanumeric and underscore allowed'
     }
 }
 
@@ -77,6 +81,8 @@ export async function selectActiveConn() {
         selectedConnId,
         vscode.ConfigurationTarget.Global
     )
+
+    updateStatusBar()
 }
 
 export async function addConn() {
@@ -155,6 +161,19 @@ export async function deleteConn() {
     )
 
     await selectActiveConn()
+}
+
+function configureStatusBar() {
+    myStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 1);
+    myStatusBarItem.tooltip = 'Select active vscode-sql connection'
+    myStatusBarItem.command = 'vscode-sql.selectActiveConnection'
+    updateStatusBar()
+    myStatusBarItem.show()
+}
+
+function updateStatusBar() {
+    const activeConn = getActiveConn()
+    myStatusBarItem.text = `$(pulse) vs-sql: ${activeConn}`
 }
 
 function encrypt(s: string) {
