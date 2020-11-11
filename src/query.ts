@@ -15,7 +15,7 @@ export class Query {
 
 	constructor(query_text: string, editor: vscode.TextEditor, query_num: number) {
 		// Clean up Query Text (remove stuff before the query)
-		this.text = trim_query(query_text);
+		this.text = query_text;
 		// Store query number:
 		this.query_num = query_num;
 		// Save Document

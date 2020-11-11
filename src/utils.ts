@@ -9,9 +9,10 @@ export function wait(ms: number){
 
 export function current_timestamp(query_num: number) {
      // Return a string with the current timestamp.
-	return '\n\nQuery '+ String(query_num) + ' run at: '+String(Date.now())
+	return '\n\nQuery ' + String(query_num) + ' run at: ' + new Date().toString()
 }
 
+// TODO: remove this function??
 export function trim_query(query: string) {
 	const query_start_regex = /[Ss][Ee][Ll][Ee][Cc][Tt]/;
 	var query_start = query.search(query_start_regex);
