@@ -173,7 +173,7 @@ function configureStatusBar() {
 
 function updateStatusBar() {
     const activeConn = getActiveConn()
-    myStatusBarItem.text = `$(pulse) vs-sql: ${activeConn}`
+    myStatusBarItem.text = `$(database) ${activeConn}`
 }
 
 function encrypt(s: string) {
