@@ -1,3 +1,5 @@
+import { window, Disposable } from 'vscode';
+
 export function wait(ms: number){
     // Synchronous wait for a number of milliseconds.
 	var start = new Date().getTime();
@@ -66,4 +68,49 @@ export function getNthColumn(table: any, n: number) {
 	}
 
 	return col
+}
+
+export async function fuzzyQuickPick(selections: string[]) {
+	// Extend the default quickPick function to allow fuzzy search when space is used
+	// Adapted from https://github.com/microsoft/vscode-extension-samples/blob/master/quickinput-sample/src/quickOpen.ts
+	const disposables: Disposable[] = [];
+	const allSelections = selections.map(label => ({ label }))
+	try {
+		return await new Promise<string | undefined>((resolve, reject) => {
+			const fuzzyPick = window.createQuickPick()
+			fuzzyPick.ignoreFocusOut = true
+			fuzzyPick.matchOnDescription = true
+			fuzzyPick.items = allSelections
+			disposables.push(
+				fuzzyPick.onDidChangeValue(value => {
+					let alphaNumericList = value.replace(/\W/gi, '').split('')
+					let pattern = alphaNumericList.join('.*')
+					let regex = new RegExp(pattern)
+					var updatedSelections = []
+					
+					for (let item of allSelections) {
+						if (regex.test(item.label)) {
+							updatedSelections.push({
+								'label': item.label,
+								'description': value
+							})
+						}
+					}
+					fuzzyPick.items = updatedSelections
+
+				}),
+				fuzzyPick.onDidChangeSelection(items => {
+					resolve(items[0].label)
+					fuzzyPick.hide()
+				}),
+				fuzzyPick.onDidHide(() => {
+					resolve(undefined);
+					fuzzyPick.dispose();
+				})
+			)
+			fuzzyPick.show();
+		})
+	} finally {
+		disposables.forEach(d => d.dispose());
+	}
 }

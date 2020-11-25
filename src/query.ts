@@ -75,6 +75,7 @@ export class Query {
                 cleaned_table.push(table[i].substring(1, table[i].length - 2));
             }
         }
+        cleaned_table.push('') // add new line at the end
         return cleaned_table.join("\n")
     }
 

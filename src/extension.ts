@@ -4,7 +4,7 @@ import * as vscode from 'vscode';
 import * as AWS from 'aws-sdk';
 import { DataFrame } from 'dataframe-js';
 import { Query } from './query';
-import { parse_queries } from './utils';
+import { parse_queries, fuzzyQuickPick } from './utils';
 import {
 	runQuery,
 	listDatabases,
@@ -53,10 +53,14 @@ async function runSQLTable() {
 					queries[i].getTimestampSelection(),
 					queries[i].format_table(results[i])
 				)
+			}).then(success => {
+				// Change the selection: start and end position of the new
+				// selection is same, so it is not to select replaced text;
+				let postion = editor.selection.end;
+				editor.selection = new vscode.Selection(postion, postion);
 			})
 		}
 	}
-
 }
 
 async function runSQLHistogram() {
@@ -93,6 +97,9 @@ async function runSQLHistogram() {
 					queries[i].getTimestampSelection(),
 					queries[i].format_histogram(results[i])
 				)
+			}).then(success => {
+				let postion = editor.selection.end;
+				editor.selection = new vscode.Selection(postion, postion);
 			})
 		}
 	}
@@ -103,10 +110,10 @@ async function getTables() {
 
 	const databases = await listDatabases();
 	console.log(databases);
-	const schema = await vscode.window.showQuickPick(databases);
+	const schema = await fuzzyQuickPick(databases);
 	
 	const tables = await listTables(schema);
-	const table = await vscode.window.showQuickPick(tables);
+	const table = await fuzzyQuickPick(tables);
 
 	const editor = vscode.window.activeTextEditor;
 	const selections = editor.selections;
@@ -116,6 +123,9 @@ async function getTables() {
 			for (var i = 0; i < selections.length; i++) {
 				editBuilder.replace(selections[i], schema+"."+table);
 			}
+		}).then(success => {
+			let postion = editor.selection.end;
+			editor.selection = new vscode.Selection(postion, postion);
 		})
 	};
 }
@@ -128,19 +138,22 @@ async function findColumn() {
 	if (editor) {
 		const databases = await listDatabases();
 		console.log(databases);
-		const schema = await vscode.window.showQuickPick(databases);
+		const schema = await fuzzyQuickPick(databases);
 		
 		const tables = await listTables(schema);
-		const table = await vscode.window.showQuickPick(tables);
+		const table = await fuzzyQuickPick(tables);
 		const columns = await listColumns(schema, table);
 
-		const column = await vscode.window.showQuickPick(columns);
+		const column = await fuzzyQuickPick(columns);
 		
 		if (editor) {
 			editor.edit(editBuilder => {
 				for (var i = 0; i < selections.length; i++) {
 					editBuilder.replace(selections[i], column);
 				}
+			}).then(success => {
+				let postion = editor.selection.end;
+				editor.selection = new vscode.Selection(postion, postion);
 			})
 		};
 	}
@@ -155,10 +168,10 @@ async function getColumns() {
 		
 		const databases = await listDatabases();
 		console.log(databases);
-		const schema = await vscode.window.showQuickPick(databases);
+		const schema = await fuzzyQuickPick(databases);
 		
 		const tables = await listTables(schema);
-		const table = await vscode.window.showQuickPick(tables);
+		const table = await fuzzyQuickPick(tables);
 		const columns = await listColumns(schema, table);
 		
 		if (editor) {
@@ -166,6 +179,9 @@ async function getColumns() {
 				for (var i = 0; i < selections.length; i++) {
 					editBuilder.replace(selections[i], columns.join(',\n'));
 				}
+			}).then(success => {
+				let postion = editor.selection.end;
+				editor.selection = new vscode.Selection(postion, postion);
 			})
 		};
 	}
@@ -178,11 +194,15 @@ async function clearResults() {
 		const selection = editor.selection
 		const selectionText = document.getText(selection);
 		// do not remove comments when clearing results
-		const clearedResults = parse_queries(selectionText, true);
+		var clearedResults = parse_queries(selectionText, true);
+		clearedResults.push('') // insert an empty line at the end
 
 		if (editor) {
 			editor.edit(editBuilder => {
 				editBuilder.replace(selection, clearedResults.join('\n\n'));
+			}).then(success => {
+				let postion = editor.selection.end;
+				editor.selection = new vscode.Selection(postion, postion);
 			})
 		};	
 	}
