@@ -3,6 +3,7 @@
 import * as vscode from 'vscode';
 import CryptoTS = require("crypto-ts");
 import cp = require('child_process');
+import os = require('os');
 
 const CONN_TYPE = [
     'athena',
@@ -49,7 +50,9 @@ export function getActiveConnType() {
 
 function parseDbFactsConnection(connId: string) {
     let cmd = `db-facts json ${connId}`
-    const stdout = cp.execSync(cmd, {'cwd': '/'}).toString()
+    let homedir = os.homedir();
+
+    const stdout = cp.execSync(cmd, { 'cwd': homedir}).toString()
     const params = JSON.parse(stdout) 
     return params
 }
