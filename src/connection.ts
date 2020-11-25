@@ -2,6 +2,7 @@
 
 import * as vscode from 'vscode';
 import CryptoTS = require("crypto-ts");
+import cp = require('child_process');
 
 const CONN_TYPE = [
     'athena',
@@ -23,7 +24,7 @@ let myStatusBarItem: vscode.StatusBarItem
 configureStatusBar()
 
 function getActiveConn() {
-    return vscode.workspace.getConfiguration('vscodeSql').get("activeConnection")
+    return vscode.workspace.getConfiguration('vscodeSql').get("activeConnection") as string
 }
 
 function getAllConns() {
@@ -32,11 +33,11 @@ function getAllConns() {
 
 function validateStr(s: string) {
     // Check if string only contains alphanumeric
-    let pattern = /^[0-9a-zA-Z_]+$/
+    let pattern = /^[0-9a-zA-Z_-]+$/
     if (s.match(pattern)) {
         return null
     } else {
-        return 'Only alphanumeric and underscore allowed'
+        return 'Only alphanumeric, underscore and dash allowed'
     }
 }
 
@@ -46,15 +47,30 @@ export function getActiveConnType() {
     return activeConnectionType
 }
 
+function parseDbFactsConnection(connId: string) {
+    let cmd = `db-facts json ${connId}`
+    const stdout = cp.execSync(cmd).toString()
+    const params = JSON.parse(stdout) 
+    return params
+}
+
 export function getPostgresParams() {
     const activeConn = getActiveConn();
     var dbConnParams = {};
-
-    for (let key of POSTGRES_PARAMS) {
-        dbConnParams[key] = vscode.workspace.getConfiguration(`vscodeSql.connections.${activeConn}`).get(key)
+    if (activeConn.startsWith('(dbfacts)')) {
+        let regex = new RegExp('^\\(dbfacts\\)', 'i')
+        let trimmedConnId = activeConn.replace(regex, '')
+        let dbfactsParams = parseDbFactsConnection(trimmedConnId)
+        for (let key of POSTGRES_PARAMS) {
+            dbConnParams[key] = dbfactsParams[key]
+        }
+        
+    } else {
+        for (let key of POSTGRES_PARAMS) {
+            dbConnParams[key] = vscode.workspace.getConfiguration(`vscodeSql.connections.${activeConn}`).get(key)
+        }
+        dbConnParams['password'] = decrypt(dbConnParams['password'])
     }
-    dbConnParams['password'] = decrypt(dbConnParams['password'])
-
     // console.log('conn params', dbConnParams)
     return dbConnParams
 }
@@ -86,7 +102,12 @@ export async function selectActiveConn() {
 }
 
 export async function addConn() {
-    const connId = await vscode.window.showInputBox({
+    const dbfactsFlag = await vscode.window.showQuickPick([
+        'Import connection from dbfacts',
+        'Create new connection'
+    ])
+
+    var connId = await vscode.window.showInputBox({
         placeHolder: 'Enter new connection name (no space or special characters). Or overwrite an existing connection.',
         validateInput: validateStr
     })
@@ -103,17 +124,21 @@ export async function addConn() {
         "type": connType
     }
     
-    if ((connType == 'postgres') || (connType == 'redshift')) {
-        for (let key of POSTGRES_PARAMS) {
-            let value = await vscode.window.showInputBox({
-                placeHolder: `Enter ${key}`,
-                ignoreFocusOut: true,
-                password: key == 'password'
-            })
-            if (key == 'password') {
-                connection[key] = encrypt(value)
-            } else {
-                connection[key] = value
+    if (dbfactsFlag == 'Import connection from dbfacts') {
+        connId = '(dbfacts)' + connId
+    } else {
+        if ((connType == 'postgres') || (connType == 'redshift')) {
+            for (let key of POSTGRES_PARAMS) {
+                let value = await vscode.window.showInputBox({
+                    placeHolder: `Enter ${key}`,
+                    ignoreFocusOut: true,
+                    password: key == 'password'
+                })
+                if (key == 'password') {
+                    connection[key] = encrypt(value)
+                } else {
+                    connection[key] = value
+                }
             }
         }
     }
