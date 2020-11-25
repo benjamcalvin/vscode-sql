@@ -53,11 +53,6 @@ async function runSQLTable() {
 					queries[i].getTimestampSelection(),
 					queries[i].format_table(results[i])
 				)
-			}).then(success => {
-				// Change the selection: start and end position of the new
-				// selection is same, so it is not to select replaced text;
-				let postion = editor.selection.end;
-				editor.selection = new vscode.Selection(postion, postion);
 			})
 		}
 	}
@@ -97,9 +92,6 @@ async function runSQLHistogram() {
 					queries[i].getTimestampSelection(),
 					queries[i].format_histogram(results[i])
 				)
-			}).then(success => {
-				let postion = editor.selection.end;
-				editor.selection = new vscode.Selection(postion, postion);
 			})
 		}
 	}
@@ -124,6 +116,8 @@ async function getTables() {
 				editBuilder.replace(selections[i], schema+"."+table);
 			}
 		}).then(success => {
+			// Change the selection: start and end position of the new
+			// selection is same, so it is not to select replaced text;
 			let postion = editor.selection.end;
 			editor.selection = new vscode.Selection(postion, postion);
 		})
@@ -200,11 +194,8 @@ async function clearResults() {
 		if (editor) {
 			editor.edit(editBuilder => {
 				editBuilder.replace(selection, clearedResults.join('\n\n'));
-			}).then(success => {
-				let postion = editor.selection.end;
-				editor.selection = new vscode.Selection(postion, postion);
 			})
-		};	
+		};
 	}
 }
 
