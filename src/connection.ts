@@ -49,7 +49,7 @@ export function getActiveConnType() {
 
 function parseDbFactsConnection(connId: string) {
     let cmd = `db-facts json ${connId}`
-    const stdout = cp.execSync(cmd).toString()
+    const stdout = cp.execSync(cmd, {'cwd': '/'}).toString()
     const params = JSON.parse(stdout) 
     return params
 }
