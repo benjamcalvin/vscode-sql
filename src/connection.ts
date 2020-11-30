@@ -49,7 +49,10 @@ export function getActiveConnType() {
 }
 
 function parseDbFactsConnection(connId: string) {
-    let cmd = `db-facts json ${connId}`
+    let regex = new RegExp('^\\(dbfacts\\)', 'i')
+    let trimmedConnId = connId.replace(regex, '')
+
+    let cmd = `db-facts json ${trimmedConnId}`
     let homedir = os.homedir();
 
     const stdout = cp.execSync(cmd, { 'cwd': homedir}).toString()
@@ -61,9 +64,7 @@ export function getPostgresParams() {
     const activeConn = getActiveConn();
     var dbConnParams = {};
     if (activeConn.startsWith('(dbfacts)')) {
-        let regex = new RegExp('^\\(dbfacts\\)', 'i')
-        let trimmedConnId = activeConn.replace(regex, '')
-        let dbfactsParams = parseDbFactsConnection(trimmedConnId)
+        let dbfactsParams = parseDbFactsConnection(activeConn)
         for (let key of POSTGRES_PARAMS) {
             dbConnParams[key] = dbfactsParams[key]
         }
@@ -111,7 +112,7 @@ export async function addConn() {
     ])
 
     var connId = await vscode.window.showInputBox({
-        placeHolder: 'Enter new connection name (no space or special characters). Or overwrite an existing connection.',
+        placeHolder: 'Enter connection name (or overwrite an existing connection)',
         validateInput: validateStr
     })
 
@@ -129,6 +130,13 @@ export async function addConn() {
     
     if (dbfactsFlag == 'Import connection from dbfacts') {
         connId = '(dbfacts)' + connId
+        try {
+            // Test if connId is a valid dbfacts name
+            parseDbFactsConnection(connId)
+        } catch(e) {
+            console.log(e)
+            throw new Error('Invalid connection. ' + e)
+        }
     } else {
         if ((connType == 'postgres') || (connType == 'redshift')) {
             for (let key of POSTGRES_PARAMS) {
