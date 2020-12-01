@@ -126,6 +126,12 @@ Running `getTables` (`cmd+shift+t`) does not count toward billing quotas.
 
 ## Release Notes
 
+### 0.1.0a
+
+Add support for Redshift, Postgres, and Big Query:
+- Includes connection configuration to support these.
+- Makes timestamps human readable.
+
 ### 0.0.2
 
 Add metadata functionality:
