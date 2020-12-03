@@ -7,7 +7,7 @@ export async function runQueryPostgres(query: string) {
     // column_names: list of string
     // result: return table as a 2D array
 
-    const connParams = getPostgresParams()
+    const connParams = await getPostgresParams()
     const client = new Client(connParams);
     await client.connect();
 

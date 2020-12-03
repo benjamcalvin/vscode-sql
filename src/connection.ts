@@ -2,6 +2,8 @@
 
 import * as vscode from 'vscode';
 import CryptoTS = require("crypto-ts");
+import crypto = require("crypto");
+import keytar = require('keytar');
 import cp = require('child_process');
 import os = require('os');
 
@@ -60,7 +62,7 @@ function parseDbFactsConnection(connId: string) {
     return params
 }
 
-export function getPostgresParams() {
+export async function getPostgresParams() {
     const activeConn = getActiveConn();
     var dbConnParams = {};
     if (activeConn.startsWith('(dbfacts)')) {
@@ -73,7 +75,7 @@ export function getPostgresParams() {
         for (let key of POSTGRES_PARAMS) {
             dbConnParams[key] = vscode.workspace.getConfiguration(`vscodeSql.connections.${activeConn}`).get(key)
         }
-        dbConnParams['password'] = decrypt(dbConnParams['password'])
+        dbConnParams['password'] = await decrypt(dbConnParams['password'])
     }
     // console.log('conn params', dbConnParams)
     return dbConnParams
@@ -146,7 +148,7 @@ export async function addConn() {
                     password: key == 'password'
                 })
                 if (key == 'password') {
-                    connection[key] = encrypt(value)
+                    connection[key] = await encrypt(value)
                 } else {
                     connection[key] = value
                 }
@@ -212,11 +214,23 @@ function updateStatusBar() {
     myStatusBarItem.text = `$(database) ${activeConn}`
 }
 
-function encrypt(s: string) {
-    // 4 random words
-    return CryptoTS.AES.encrypt(s, 'eachstuffamountproof').toString();
+
+async function getKey() {
+    var randKey = await keytar.getPassword('vscode.vscode-sql', 'vscode-sql')
+    if (randKey === null) {
+        // create new key on the first run
+        randKey = crypto.randomBytes(20).toString('hex');
+        await keytar.setPassword('vscode.vscode-sql', 'vscode-sql', randKey)
+    }
+    return randKey
 }
 
-function decrypt(s: string) {
-    return CryptoTS.AES.decrypt(s, 'eachstuffamountproof').toString(CryptoTS.enc.Utf8)
+async function encrypt(s: string) {
+    const key = await getKey()
+    return CryptoTS.AES.encrypt(s, key).toString()
+}
+
+async function decrypt(s: string) {
+    const key = await getKey()
+    return CryptoTS.AES.decrypt(s, key).toString(CryptoTS.enc.Utf8)
 }
