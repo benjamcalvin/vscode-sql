@@ -65,18 +65,10 @@ function parseDbFactsConnection(connId: string) {
 export async function getPostgresParams() {
     const activeConn = getActiveConn();
     var dbConnParams = {};
-    if (activeConn.startsWith('(dbfacts)')) {
-        let dbfactsParams = parseDbFactsConnection(activeConn)
-        for (let key of POSTGRES_PARAMS) {
-            dbConnParams[key] = dbfactsParams[key]
-        }
-        
-    } else {
-        for (let key of POSTGRES_PARAMS) {
-            dbConnParams[key] = vscode.workspace.getConfiguration(`vscodeSql.connections.${activeConn}`).get(key)
-        }
-        dbConnParams['password'] = await decrypt(dbConnParams['password'])
+    for (let key of POSTGRES_PARAMS) {
+        dbConnParams[key] = vscode.workspace.getConfiguration(`vscodeSql.connections.${activeConn}`).get(key)
     }
+    dbConnParams['password'] = await decrypt(dbConnParams['password'])
     // console.log('conn params', dbConnParams)
     return dbConnParams
 }
@@ -107,14 +99,34 @@ export async function selectActiveConn() {
     updateStatusBar()
 }
 
-export async function addConn() {
-    const dbfactsFlag = await vscode.window.showQuickPick([
-        'Import connection from dbfacts',
-        'Create new connection'
-    ])
-
+export async function importConnFromDbfacts() {
     var connId = await vscode.window.showInputBox({
-        placeHolder: 'Enter connection name (or overwrite an existing connection)',
+        placeHolder: 'Enter db-facts connection name',
+        validateInput: validateStr
+    })
+    
+    const params = parseDbFactsConnection(connId)
+    
+    var connection = {
+        'type': params['type']
+    }
+    let connType = connection['type']
+    
+    if ((connType == 'postgres') || (connType == 'redshift')) {
+        for (let key of POSTGRES_PARAMS) {
+            if (key == 'password') {
+                connection[key] = await encrypt(params[key])
+            } else {
+                connection[key] = params[key]
+            }
+        }
+    }
+    await saveConn(connId, connection)
+}
+
+export async function addConn() {
+    var connId = await vscode.window.showInputBox({
+        placeHolder: 'Enter new connection name (or existing connection to overwrite)',
         validateInput: validateStr
     })
 
@@ -129,33 +141,26 @@ export async function addConn() {
     var connection = {
         "type": connType
     }
-    
-    if (dbfactsFlag == 'Import connection from dbfacts') {
-        connId = '(dbfacts)' + connId
-        try {
-            // Test if connId is a valid dbfacts name
-            parseDbFactsConnection(connId)
-        } catch(e) {
-            console.log(e)
-            throw new Error('Invalid connection. ' + e)
-        }
-    } else {
-        if ((connType == 'postgres') || (connType == 'redshift')) {
-            for (let key of POSTGRES_PARAMS) {
-                let value = await vscode.window.showInputBox({
-                    placeHolder: `Enter ${key}`,
-                    ignoreFocusOut: true,
-                    password: key == 'password'
-                })
-                if (key == 'password') {
-                    connection[key] = await encrypt(value)
-                } else {
-                    connection[key] = value
-                }
+
+    if ((connType == 'postgres') || (connType == 'redshift')) {
+        for (let key of POSTGRES_PARAMS) {
+            let value = await vscode.window.showInputBox({
+                placeHolder: `Enter ${key}`,
+                ignoreFocusOut: true,
+                password: key == 'password'
+            })
+            if (key == 'password') {
+                connection[key] = await encrypt(value)
+            } else {
+                connection[key] = value
             }
         }
     }
 
+    await saveConn(connId, connection)
+}
+
+async function saveConn(connId: string, connection: any) {
     var allConnections = getAllConns()
     allConnections[connId] = connection
 

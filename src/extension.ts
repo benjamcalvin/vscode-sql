@@ -11,7 +11,7 @@ import {
 	listTables,
 	listColumns
 } from './db-selection';
-import { selectActiveConn, addConn, deleteConn } from './connection'
+import { selectActiveConn, addConn, deleteConn, importConnFromDbfacts } from './connection'
 
 
 AWS.config.update({
@@ -221,6 +221,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	let disposable_select_active_connection = vscode.commands.registerCommand('vscode-sql.selectActiveConnection', selectActiveConn)
 	let disposable_add_connection = vscode.commands.registerCommand('vscode-sql.addConnection', addConn)
 	let disposable_delete_connection = vscode.commands.registerCommand('vscode-sql.deleteConnection', deleteConn)
+	let disposable_import_connection = vscode.commands.registerCommand('vscode-sql.importConnectionFromDbfacts', importConnFromDbfacts)
 
 	context.subscriptions.push(disposable_table);
 	context.subscriptions.push(disposable_histogram);
@@ -231,6 +232,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(disposable_select_active_connection);
 	context.subscriptions.push(disposable_add_connection);
 	context.subscriptions.push(disposable_delete_connection);
+	context.subscriptions.push(disposable_import_connection);
 
 }
 
