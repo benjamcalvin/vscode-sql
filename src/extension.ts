@@ -3,10 +3,16 @@
 import * as vscode from 'vscode';
 import * as AWS from 'aws-sdk';
 import { DataFrame } from 'dataframe-js';
-import { listColumns, listDatabases, listTables, runAthenaQuery } from './athena';
 import { Query } from './query';
-import { parse_queries } from './utils';
-import { countReset } from 'console';
+import { parse_queries, fuzzyQuickPick } from './utils';
+import {
+	runQuery,
+	listDatabases,
+	listTables,
+	listColumns
+} from './db-selection';
+import { selectActiveConn, addConn, deleteConn, importConnFromDbfacts } from './connection'
+
 
 AWS.config.update({
 	region: 'us-east-1'
@@ -40,8 +46,8 @@ async function runSQLTable() {
 			// This expects a tuple of results [columns, values] where columns is
 			// a 1-dimensional array of column names and values is a 2-dimensional
 			// array of rows, and columns respectively.
-
-			results.push(await runAthenaQuery(queries[i].text));
+			results.push(await runQuery(queries[i].text));
+			
 			editor.edit(editBuilder => {
 				editBuilder.replace(
 					queries[i].getTimestampSelection(),
@@ -50,7 +56,6 @@ async function runSQLTable() {
 			})
 		}
 	}
-
 }
 
 async function runSQLHistogram() {
@@ -80,7 +85,7 @@ async function runSQLHistogram() {
 			// This expects a tuple of results [columns, values] where columns is
 			// a 1-dimensional array of column names and values is a 2-dimensional
 			// array of rows, and columns respectively.
-			results.push(await runAthenaQuery(queries[i].text));
+			results.push(await runQuery(queries[i].text));
 
 			editor.edit(editBuilder => {
 				editBuilder.replace(
@@ -97,10 +102,10 @@ async function getTables() {
 
 	const databases = await listDatabases();
 	console.log(databases);
-	const schema = await vscode.window.showQuickPick(databases);
+	const schema = await fuzzyQuickPick(databases);
 	
 	const tables = await listTables(schema);
-	const table = await vscode.window.showQuickPick(tables);
+	const table = await fuzzyQuickPick(tables);
 
 	const editor = vscode.window.activeTextEditor;
 	const selections = editor.selections;
@@ -110,6 +115,11 @@ async function getTables() {
 			for (var i = 0; i < selections.length; i++) {
 				editBuilder.replace(selections[i], schema+"."+table);
 			}
+		}).then(success => {
+			// Change the selection: start and end position of the new
+			// selection is same, so it is not to select replaced text;
+			let postion = editor.selection.end;
+			editor.selection = new vscode.Selection(postion, postion);
 		})
 	};
 }
@@ -122,19 +132,22 @@ async function findColumn() {
 	if (editor) {
 		const databases = await listDatabases();
 		console.log(databases);
-		const schema = await vscode.window.showQuickPick(databases);
+		const schema = await fuzzyQuickPick(databases);
 		
 		const tables = await listTables(schema);
-		const table = await vscode.window.showQuickPick(tables);
+		const table = await fuzzyQuickPick(tables);
 		const columns = await listColumns(schema, table);
 
-		const column = await vscode.window.showQuickPick(columns);
+		const column = await fuzzyQuickPick(columns);
 		
 		if (editor) {
 			editor.edit(editBuilder => {
 				for (var i = 0; i < selections.length; i++) {
 					editBuilder.replace(selections[i], column);
 				}
+			}).then(success => {
+				let postion = editor.selection.end;
+				editor.selection = new vscode.Selection(postion, postion);
 			})
 		};
 	}
@@ -149,10 +162,10 @@ async function getColumns() {
 		
 		const databases = await listDatabases();
 		console.log(databases);
-		const schema = await vscode.window.showQuickPick(databases);
+		const schema = await fuzzyQuickPick(databases);
 		
 		const tables = await listTables(schema);
-		const table = await vscode.window.showQuickPick(tables);
+		const table = await fuzzyQuickPick(tables);
 		const columns = await listColumns(schema, table);
 		
 		if (editor) {
@@ -160,12 +173,31 @@ async function getColumns() {
 				for (var i = 0; i < selections.length; i++) {
 					editBuilder.replace(selections[i], columns.join(',\n'));
 				}
+			}).then(success => {
+				let postion = editor.selection.end;
+				editor.selection = new vscode.Selection(postion, postion);
 			})
 		};
 	}
 }
 
+async function clearResults() {
+	let editor = vscode.window.activeTextEditor;
+	let document = editor.document;
+	if (editor) {
+		const selection = editor.selection
+		const selectionText = document.getText(selection);
+		// do not remove comments when clearing results
+		var clearedResults = parse_queries(selectionText, true);
+		clearedResults.push('') // insert an empty line at the end
 
+		if (editor) {
+			editor.edit(editBuilder => {
+				editBuilder.replace(selection, clearedResults.join('\n\n'));
+			})
+		};
+	}
+}
 
 
 
@@ -185,13 +217,23 @@ export async function activate(context: vscode.ExtensionContext) {
 	let disposable_tables = vscode.commands.registerCommand('vscode-sql.getTables', getTables)
 	let disposable_find_column = vscode.commands.registerCommand('vscode-sql.findColumn', findColumn)
 	let disposable_get_columns = vscode.commands.registerCommand('vscode-sql.getColumns', getColumns)
-
+	let disposable_clear_results = vscode.commands.registerCommand('vscode-sql.clearResults', clearResults)
+	let disposable_select_active_connection = vscode.commands.registerCommand('vscode-sql.selectActiveConnection', selectActiveConn)
+	let disposable_add_connection = vscode.commands.registerCommand('vscode-sql.addConnection', addConn)
+	let disposable_delete_connection = vscode.commands.registerCommand('vscode-sql.deleteConnection', deleteConn)
+	let disposable_import_connection = vscode.commands.registerCommand('vscode-sql.importConnectionFromDbfacts', importConnFromDbfacts)
 
 	context.subscriptions.push(disposable_table);
 	context.subscriptions.push(disposable_histogram);
 	context.subscriptions.push(disposable_tables);
 	context.subscriptions.push(disposable_find_column);
 	context.subscriptions.push(disposable_get_columns);
+	context.subscriptions.push(disposable_clear_results);
+	context.subscriptions.push(disposable_select_active_connection);
+	context.subscriptions.push(disposable_add_connection);
+	context.subscriptions.push(disposable_delete_connection);
+	context.subscriptions.push(disposable_import_connection);
+
 }
 
 // this method is called when your extension is deactivated

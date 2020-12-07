@@ -4,7 +4,7 @@ import { wait } from "./utils";
 
 const ATHENA_DATA_CATALOG = "AwsDataCatalog";
 
-export async function runAthenaQuery(query: string) {
+export async function runQueryAthena(query: string) {
     // Takes in a query and returns a DataFrame with the results.
 	var startQueryExecutionResponse = await startQueryExecution(query)
 	const queryExecutionId = startQueryExecutionResponse['QueryExecutionId']
@@ -90,7 +90,7 @@ async function getQueryResults(queryExecutionId: string) {
 	return athena.getQueryResults(query_params).promise()
 }
 
-export async function listDatabases() {
+export async function listDatabasesAthena() {
 	const athena = new AWS.Athena();
 	const params = {
 		CatalogName: ATHENA_DATA_CATALOG,
@@ -107,7 +107,7 @@ export async function listDatabases() {
 	return databases;
 }
 
-export async function listTables(databaseName: string) {
+export async function listTablesAthena(databaseName: string) {
 	const athena = new AWS.Athena();
 	const params = {
 		CatalogName: ATHENA_DATA_CATALOG,
@@ -125,7 +125,7 @@ export async function listTables(databaseName: string) {
 	return tables;
 }
 
-export async function listColumns(database: string, table: string) {
+export async function listColumnsAthena(database: string, table: string) {
 	const athena = new AWS.Athena();
 	const params = {
 		CatalogName: ATHENA_DATA_CATALOG,

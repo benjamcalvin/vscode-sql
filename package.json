@@ -4,7 +4,7 @@
 	"publisher": "benjamcalvin",
 	"repository": "https://github.com/benjamcalvin/vscode-sql",
 	"description": "Plugin for interactively running SQL queries.",
-	"version": "0.0.2",
+	"version": "0.1.0",
 	"engines": {
 		"vscode": "^1.49.0"
 	},
@@ -16,7 +16,12 @@
 		"onCommand:vscode-sql.executeSQLHistogram",
 		"onCommand:vscode-sql.getTables",
 		"onCommand:vscode-sql.findColumn",
-		"onCommand:vscode-sql.getColumns"
+		"onCommand:vscode-sql.getColumns",
+		"onCommand:vscode-sql.clearResults",
+		"onCommand:vscode-sql.selectActiveConnection",
+		"onCommand:vscode-sql.addConnection",
+		"onCommand:vscode-sql.deleteConnection",
+		"onCommand:vscode-sql.importConnectionFromDbfacts"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -38,8 +43,28 @@
 				"title": "VS-SQL: Find Column"
 			},
 			{
+				"command": "vscode-sql.clearResults",
+				"title": "VS-SQL: Clear Results"
+			},
+			{
 				"command": "vscode-sql.getColumns",
 				"title": "VS-SQL: List All Columns"
+			},
+			{
+				"command": "vscode-sql.selectActiveConnection",
+				"title": "VS-SQL: Select Active Connection"
+			},
+			{
+				"command": "vscode-sql.addConnection",
+				"title": "VS-SQL: Add Connection"
+			},
+			{
+				"command": "vscode-sql.deleteConnection",
+				"title": "VS-SQL: Delete Connection"
+			},
+			{
+				"command": "vscode-sql.importConnectionFromDbfacts",
+				"title": "VS-SQL: Import Connection from db-facts"
 			}
 		],
 		"keybindings": [
@@ -58,8 +83,32 @@
 			{
 				"command": "vscode-sql.findColumn",
 				"key": "cmd+shift+c"
+			},
+			{
+				"command": "vscode-sql.clearResults",
+				"key": "cmd+shift+k"
 			}
-		]
+		],
+		"configuration": {
+			"type": "object",
+			"title": "vscode-sql",
+			"properties": {
+				"vscodeSql.activeConnection": {
+					"type": "string",
+					"default": "defaultDb",
+					"description": "Select your active DB connection"
+				},
+				"vscodeSql.connections": {
+					"default": {},
+					"description": "Store all DB connections"
+				},
+				"vscodeSql.connections.defaultDb.type": {
+					"type": "string",
+					"default": "athena",
+					"description": "DB connection type"
+				}
+			}
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
@@ -83,10 +132,14 @@
 		"vscode-test": "^1.4.0"
 	},
 	"dependencies": {
+		"@google-cloud/bigquery": "^5.4.0",
 		"ascii-histogram": "^1.2.1",
 		"ascii-table": "0.0.9",
+		"aws-sdk": "^2.766.0",
 		"bars": "github:jstrace/bars",
+		"crypto-ts": "^1.0.2",
 		"dataframe-js": "^1.4.3",
-		"aws-sdk": "^2.766.0"
+		"keytar": "^7.2.0",
+		"ts-postgres": "^1.1.3"
 	}
 }
