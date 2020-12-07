@@ -2,10 +2,19 @@
 
 This is a plugin to facilitate interactive EDA using SQL.
 
+## Installation
+
+1. Navigate to [release](https://github.com/benjamcalvin/vscode-sql/releases)
+	and download the latest release.
+2. In VSCode, open the command palete (`cmd+shift+p`) and type `Extensions:
+	Install from VSIX ...`, or click "Install from VISX" from the extensions sidebar.
+3. Select the downloaded `.visx` to install
+4. Voila -- reload and it's installed.
+
 ## Features
 
 ### Running a Query
-Vscode-sql runs highlighted queries in the background and inserts the results inline. You can do this by hilighting a query (or queries) and using the command pallet `Execute SQL command` or pressing `shift+enter`.
+vscode-sql runs highlighted queries in the background and inserts the results inline. You can do this by hilighting a query (or queries) and using the command pallet `Execute SQL command` or pressing `shift+enter`.
 
 ![Running a Query](example_query.gif)
 
@@ -31,14 +40,58 @@ SELECT 'women', 'age 50-75', 222
   women age 50-75 | ###############################                              | 222
 
 ```
+
+### Clearing results
+You can clear the results of multiple queries after highlighting them using
+`cmd+shift+k` or the `VS-SQL: Clear Results` command.
+
+![Clearing results](clear_results.gif)
+
+### Find table and columns
+ - `cmd+shift+t`: find and insert table name
+ - `cmd_shift_c`: find and insert column name
+ - (Command palete) `VS-SQL: List All Columns`: list all column names of a
+   table, separated by commas
+
 ## Database Connections
-TODO: add gif
 
-## Installation
+vcode-sql allows multiple connections of different database types.
+However, only one connection can be active at any time.
 
-1. Navigate to release and download the latest release.
-2. In the extensions tab in VSCode, click "Install from VISX"
-3. Voila -- reload and it's installed.
+### Adding a connection
+  1. Open the command palette and run `VS-SQL: Add Connection`
+  2. Enter a connection name (only alphanumrics, dashes, and underscores allowed)
+  3. Select a connection type and enter other connection parameters
+  4. Select the newly added connection as the active connection
+
+Note: To edit a connection, add a new connection with the same name will
+overwrites that connection parameters.
+
+### Importing a connection from db-facts
+vscode-sql allows importing database credentials from
+[db-facts](https://github.com/bluelabsio/db-facts).
+	
+  1. Check that the connection exist in db-facts by running
+	  `db-facts config <connection-name>` in the terminal
+  2. Open the command palette and run `VS-SQL: Import Connection from db-facts`
+  3. Enter the db-facts connection name
+  4. Select the newly added connection as the active connection
+
+### Selecting the active connection
+You can select or change the current active connection by running
+`VS-SQL: Select Active Connection` in the command palete or clicking
+on the vs-sql status bar item in the bottom left. This is useful when working
+with multiple databases.
+
+### Deleting a connection
+Run `VS-SQL: Delete Connection` and select a connection to delete
+
+## Development
+1. Navigate into the `vscode-sql` directory.
+2. Make sure you've got nodejs installed (and npm).
+3. Run `npm install` to install the plugin and development dependencies.
+4. Hit `F5` to build the plugin and open a new window for testing.
+5. Hit `cmd+shift+F5` to refresh code changes in the debugger window.
 
 ### Rebuilding
 1. Navigate into the `vscode-sql` directory.
@@ -50,19 +103,12 @@ npm install -g vsce
 ```bash
 vsce package --baseImagesUrl https://github.com/benjamcalvin/vscode-sql/blob/main/
 ```
-4. Install the .vslx file that is generated (`vscode-sql-x.x.x.vslx`) using the `Install from VSLX` option.
+4. Install the .vslx file that is generated (`vscode-sql-x.x.x.vslx`) using the `Install from VSLX` option or from the terminal using `code --install-extension vscode-sql-X.X.X.vsix`.
 
 For more information, see: https://code.visualstudio.com/api/working-with-extensions/publishing-extension
 
-### Development
-1. Navigate into the `vscode-sql` directory.
-2. Make sure you've got nodejs installed (and npm).
-3. Run `npm install` to install the plugin and development dependencies.
-4. Hit `F5` to build the plugin and open a new window for testing.
-5. Hit `cmd+shift+F5` to refresh code changes in the debugger window.
-
-### Adding Support for other Databases
-To add support for other databases:
+### Adding support for a new type of database connection
+To add support for a new database:
 1. Create a new file `myDb.ts`
 2. This file should contain the following 4 functions with the appropriate return types.
    See `athena.ts` or `postgres.ts` for example.
@@ -127,10 +173,16 @@ Running `getTables` (`cmd+shift+t`) does not count toward billing quotas.
 ## Release Notes
 
 ### 0.1.0
+Add support for databases
+ - Postgres/Redshift
+ - Big Query
 
-Add support for Redshift, Postgres, and Big Query:
-- Includes connection configuration to support these.
-- Makes timestamps human readable.
+Add clear results functionality
+
+Add database connection manager
+ - Add a new database conneciton (or overwite an existing connection)
+ - Remove a database connection
+ - Import a connection from db-facts
 
 ### 0.0.2
 

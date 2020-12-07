@@ -2,6 +2,10 @@
 
 import * as vscode from 'vscode';
 import CryptoTS = require("crypto-ts");
+import crypto = require("crypto");
+import keytar = require('keytar');
+import cp = require('child_process');
+import os = require('os');
 
 const CONN_TYPE = [
     'athena',
@@ -23,7 +27,7 @@ let myStatusBarItem: vscode.StatusBarItem
 configureStatusBar()
 
 function getActiveConn() {
-    return vscode.workspace.getConfiguration('vscodeSql').get("activeConnection")
+    return vscode.workspace.getConfiguration('vscodeSql').get("activeConnection") as string
 }
 
 function getAllConns() {
@@ -32,11 +36,11 @@ function getAllConns() {
 
 function validateStr(s: string) {
     // Check if string only contains alphanumeric
-    let pattern = /^[0-9a-zA-Z_]+$/
+    let pattern = /^[0-9a-zA-Z_-]+$/
     if (s.match(pattern)) {
         return null
     } else {
-        return 'Only alphanumeric and underscore allowed'
+        return 'Only alphanumeric, underscore and dash allowed'
     }
 }
 
@@ -46,15 +50,25 @@ export function getActiveConnType() {
     return activeConnectionType
 }
 
-export function getPostgresParams() {
+function parseDbFactsConnection(connId: string) {
+    let regex = new RegExp('^\\(dbfacts\\)', 'i')
+    let trimmedConnId = connId.replace(regex, '')
+
+    let cmd = `db-facts json ${trimmedConnId}`
+    let homedir = os.homedir();
+
+    const stdout = cp.execSync(cmd, { 'cwd': homedir}).toString()
+    const params = JSON.parse(stdout) 
+    return params
+}
+
+export async function getPostgresParams() {
     const activeConn = getActiveConn();
     var dbConnParams = {};
-
     for (let key of POSTGRES_PARAMS) {
         dbConnParams[key] = vscode.workspace.getConfiguration(`vscodeSql.connections.${activeConn}`).get(key)
     }
-    dbConnParams['password'] = decrypt(dbConnParams['password'])
-
+    dbConnParams['password'] = await decrypt(dbConnParams['password'])
     // console.log('conn params', dbConnParams)
     return dbConnParams
 }
@@ -85,9 +99,34 @@ export async function selectActiveConn() {
     updateStatusBar()
 }
 
+export async function importConnFromDbfacts() {
+    var connId = await vscode.window.showInputBox({
+        placeHolder: 'Enter db-facts connection name',
+        validateInput: validateStr
+    })
+    
+    const params = parseDbFactsConnection(connId)
+    
+    var connection = {
+        'type': params['type']
+    }
+    let connType = connection['type']
+    
+    if ((connType == 'postgres') || (connType == 'redshift')) {
+        for (let key of POSTGRES_PARAMS) {
+            if (key == 'password') {
+                connection[key] = await encrypt(params[key])
+            } else {
+                connection[key] = params[key]
+            }
+        }
+    }
+    await saveConn(connId, connection)
+}
+
 export async function addConn() {
-    const connId = await vscode.window.showInputBox({
-        placeHolder: 'Enter new connection name (no space or special characters). Or overwrite an existing connection.',
+    var connId = await vscode.window.showInputBox({
+        placeHolder: 'Enter new connection name (or existing connection to overwrite)',
         validateInput: validateStr
     })
 
@@ -102,7 +141,7 @@ export async function addConn() {
     var connection = {
         "type": connType
     }
-    
+
     if ((connType == 'postgres') || (connType == 'redshift')) {
         for (let key of POSTGRES_PARAMS) {
             let value = await vscode.window.showInputBox({
@@ -111,13 +150,17 @@ export async function addConn() {
                 password: key == 'password'
             })
             if (key == 'password') {
-                connection[key] = encrypt(value)
+                connection[key] = await encrypt(value)
             } else {
                 connection[key] = value
             }
         }
     }
 
+    await saveConn(connId, connection)
+}
+
+async function saveConn(connId: string, connection: any) {
     var allConnections = getAllConns()
     allConnections[connId] = connection
 
@@ -176,11 +219,23 @@ function updateStatusBar() {
     myStatusBarItem.text = `$(database) ${activeConn}`
 }
 
-function encrypt(s: string) {
-    // 4 random words
-    return CryptoTS.AES.encrypt(s, 'eachstuffamountproof').toString();
+
+async function getKey() {
+    var randKey = await keytar.getPassword('vscode.vscode-sql', 'vscode-sql')
+    if (randKey === null) {
+        // create new key on the first run
+        randKey = crypto.randomBytes(20).toString('hex');
+        await keytar.setPassword('vscode.vscode-sql', 'vscode-sql', randKey)
+    }
+    return randKey
 }
 
-function decrypt(s: string) {
-    return CryptoTS.AES.decrypt(s, 'eachstuffamountproof').toString(CryptoTS.enc.Utf8)
+async function encrypt(s: string) {
+    const key = await getKey()
+    return CryptoTS.AES.encrypt(s, key).toString()
+}
+
+async function decrypt(s: string) {
+    const key = await getKey()
+    return CryptoTS.AES.decrypt(s, key).toString(CryptoTS.enc.Utf8)
 }
