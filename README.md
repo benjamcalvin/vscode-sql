@@ -14,7 +14,7 @@ This is a plugin to facilitate interactive EDA using SQL.
 ## Features
 
 ### Running a Query
-Vscode-sql runs highlighted queries in the background and inserts the results inline. You can do this by hilighting a query (or queries) and using the command pallet `Execute SQL command` or pressing `shift+enter`.
+vscode-sql runs highlighted queries in the background and inserts the results inline. You can do this by hilighting a query (or queries) and using the command pallet `Execute SQL command` or pressing `shift+enter`.
 
 ![Running a Query](example_query.gif)
 
@@ -54,10 +54,10 @@ vcode-sql allows multiple connections of different database types.
 However, only one connection can be active at any time.
 
 ### Adding a connection
-	1. Open the command palette and run `VS-SQL: Add Connection`
-	2. Enter a connection name (only alphanumrics, dashes, and underscores allowed)
-	3. Select a connection type and enter other connection parameters
-	4. Select the newly added connection as the active connection
+  1. Open the command palette and run `VS-SQL: Add Connection`
+  2. Enter a connection name (only alphanumrics, dashes, and underscores allowed)
+  3. Select a connection type and enter other connection parameters
+  4. Select the newly added connection as the active connection
 
 Note: To edit a connection, add a new connection with the same name will
 overwrites that connection parameters.
@@ -66,11 +66,11 @@ overwrites that connection parameters.
 vscode-sql allows importing database credentials from
 [db-facts](https://github.com/bluelabsio/db-facts).
 	
-	1. Check that the connection exist in db-facts by running
-		`db-facts config <connection-name>` in the terminal
-	2. Open the command palette and run `VS-SQL: Import Connection from db-facts`
-	3. Enter the db-facts connection name
-	4. Select the newly added connection as the active connection
+  1. Check that the connection exist in db-facts by running
+	  `db-facts config <connection-name>` in the terminal
+  2. Open the command palette and run `VS-SQL: Import Connection from db-facts`
+  3. Enter the db-facts connection name
+  4. Select the newly added connection as the active connection
 
 ### Selecting the active connection
 You can select or change the current active connection by running
@@ -102,8 +102,8 @@ vsce package --baseImagesUrl https://github.com/benjamcalvin/vscode-sql/blob/mai
 
 For more information, see: https://code.visualstudio.com/api/working-with-extensions/publishing-extension
 
-### Adding Support for other Databases
-To add support for other databases:
+### Adding support for a new type of database connection
+To add support for a new database:
 1. Create a new file `myDb.ts`
 2. This file should contain the following 4 functions with the appropriate return types.
    See `athena.ts` or `postgres.ts` for example.
