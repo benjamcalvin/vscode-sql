@@ -6,7 +6,7 @@ This is a plugin to facilitate interactive EDA using SQL.
 
 1. Navigate to [release](https://github.com/benjamcalvin/vscode-sql/releases)
 	and download the latest release.
-2. In VSCode, open the command pallete (`cmd+shift+p`) and type `Extensions:
+2. In VSCode, open the command palete (`cmd+shift+p`) and type `Extensions:
 	Install from VSIX ...`, or click "Install from VISX" from the extensions sidebar.
 3. Select the downloaded `.visx` to install
 4. Voila -- reload and it's installed.
@@ -47,6 +47,11 @@ You can clear the results of multiple queries after highlighting them using
 
 ![Clearing results](clear_results.gif)
 
+### Find table and columns
+ - `cmd+shift+t`: find and insert table name
+ - `cmd_shift_c`: find and insert column name
+ - (Command palete) `VS-SQL: List All Columns`: list all column names of a
+   table, separated by commas
 
 ## Database Connections
 
@@ -74,7 +79,7 @@ vscode-sql allows importing database credentials from
 
 ### Selecting the active connection
 You can select or change the current active connection by running
-`VS-SQL: Select Active Connection` in the command pallete or clicking
+`VS-SQL: Select Active Connection` in the command palete or clicking
 on the vs-sql status bar item in the bottom left. This is useful when working
 with multiple databases.
 
