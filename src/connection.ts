@@ -59,12 +59,19 @@ export function getActiveConnType() {
 function parseDbFactsConnection(connId: string) {
     let regex = new RegExp('^\\(dbfacts\\)', 'i')
     let trimmedConnId = connId.replace(regex, '')
-
     let cmd = `db-facts json ${trimmedConnId}`
-    let homedir = os.homedir();
 
-    const stdout = cp.execSync(cmd, { 'cwd': homedir}).toString()
-    const params = JSON.parse(stdout) 
+    let dbfactsPath = vscode.workspace.getConfiguration('vscodeSql').get("dbfactsPath")
+    var env = process.env
+    if (dbfactsPath != null) {
+        env.PATH = `${dbfactsPath}:${env.PATH}`
+    }
+    let cpOptions = {
+        'env': env,
+    }
+
+    const stdout = cp.execSync(cmd, cpOptions).toString()
+    const params = JSON.parse(stdout)
     return params
 }
 
