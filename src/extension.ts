@@ -11,7 +11,13 @@ import {
 	listTables,
 	listColumns
 } from './db-selection';
-import { selectActiveConn, addConn, deleteConn, importConnFromDbfacts } from './connection'
+import { 
+	selectActiveConn,
+	addConn,
+	deleteConn,
+	importConnFromDbfacts,
+	setupConnection
+} from './connection'
 
 
 AWS.config.update({
@@ -234,6 +240,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(disposable_delete_connection);
 	context.subscriptions.push(disposable_import_connection);
 
+	setupConnection()
 }
 
 // this method is called when your extension is deactivated
