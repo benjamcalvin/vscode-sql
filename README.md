@@ -172,6 +172,9 @@ Running `getTables` (`cmd+shift+t`) does not count toward billing quotas.
 
 ## Release Notes
 
+### 0.1.1
+Fix db-facts restart issue. Add caching.
+
 ### 0.1.0
 Add support for databases
  - Postgres/Redshift

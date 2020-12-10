@@ -5,7 +5,6 @@ import CryptoTS = require("crypto-ts");
 import crypto = require("crypto");
 import keytar = require('keytar');
 import cp = require('child_process');
-import os = require('os');
 
 const CONN_TYPE = [
     'athena',
