@@ -36,7 +36,8 @@ export function parse_queries(query: string, includeComments=false) {
 		"insert",
 		"copy",
 		"with",
-		"delete"
+		"delete",
+		"explain"
 	]
 
 	var patterns = []
@@ -44,7 +45,7 @@ export function parse_queries(query: string, includeComments=false) {
 	// Use lazy quantifier ? to find the query ending as early as possible
 	// https://javascript.info/regexp-greedy-and-lazy
 	for (let cmd of commands) {
-		patterns.push(`(${cmd}.*?;)`)
+		patterns.push(`(${cmd}\\b.*?;)`)
 	}
 
 	if (includeComments) {
