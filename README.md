@@ -4,7 +4,7 @@ This is a plugin to facilitate interactive EDA using SQL.
 
 ## Installation
 
-1. Navigate to [release](https://github.com/benjamcalvin/vscode-sql/releases)
+1. Navigate to [Releases](https://github.com/benjamcalvin/vscode-sql/releases)
 	and download the latest release.
 2. In VSCode, open the command palette (`cmd+shift+p`) and type `Extensions:
 	Install from VSIX ...`, or click "Install from VISX" from the extensions sidebar.
