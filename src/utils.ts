@@ -59,7 +59,6 @@ export function parse_queries(query: string, includeComments=false) {
 	const patternRegExp = new RegExp(patterns.join("|"), "gis")
 	const parsed_queries = query.match(patternRegExp)
 	// console.log(parsed_queries)
-	console.log(parsed_queries)
 	return parsed_queries
 }
 
