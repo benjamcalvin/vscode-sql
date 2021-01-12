@@ -77,11 +77,7 @@ function parseDbFactsConnection(connId: string) {
 export async function getPostgresParams() {
     const activeConn = getActiveConn();
 
-    // Enable SSL by default
-    // TODO: make it a config parameter
-    var dbConnParams = {
-        'ssl': true
-    };
+    var dbConnParams = {}
 
     if (activeConn.startsWith('(dbfacts)')) {
         let params = dbfactsConn[activeConn]
@@ -100,6 +96,7 @@ export async function getPostgresParams() {
         }
         dbConnParams['password'] = await keytar.getPassword('vscode.vscode-sql', activeConn)
     }
+    dbConnParams['ssl'] = vscode.workspace.getConfiguration(`vscodeSql.connections.${activeConn}`).get('ssl')
     // console.log('conn params', dbConnParams)
     return dbConnParams
 }
@@ -141,7 +138,8 @@ export async function importConnFromDbfacts() {
     connId = '(dbfacts)' + connId
     const params = parseDbFactsConnection(connId)
     const connection = {
-        'type': params['type']
+        'type': params['type'],
+        'ssl': await sslPicker()
     }
     
     await saveConn(connId, connection)
@@ -178,9 +176,30 @@ export async function addConn() {
                 connection[key] = value
             }
         }
+
+        connection['ssl'] = await sslPicker()
     }
 
     await saveConn(connId, connection)
+}
+
+async function sslPicker(){
+    let sslSelection = await vscode.window.showQuickPick(
+        [
+            'Yes (recommended)',
+            'No'
+        ],
+        {
+            placeHolder: `Enable SSL?`,
+            ignoreFocusOut: true,
+        }
+    )
+    let sslFlag = true
+    if (sslSelection == 'No') {
+        sslFlag = false
+    }
+
+    return sslFlag
 }
 
 async function saveConn(connId: string, connection: any) {
