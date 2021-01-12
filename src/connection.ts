@@ -76,7 +76,12 @@ function parseDbFactsConnection(connId: string) {
 
 export async function getPostgresParams() {
     const activeConn = getActiveConn();
-    var dbConnParams = {};
+
+    // Enable SSL by default
+    // TODO: make it a config parameter
+    var dbConnParams = {
+        'ssl': true
+    };
 
     if (activeConn.startsWith('(dbfacts)')) {
         let params = dbfactsConn[activeConn]
