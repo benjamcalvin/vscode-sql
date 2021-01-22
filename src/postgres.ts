@@ -13,12 +13,20 @@ export async function runQueryPostgres(query: string) {
         const client = new Client(connParams)
         await client.connect();
 
-        const result = await client.query({
+        var result = await client.query({
             'text': query,
             'values': [],
             'rowMode': 'array',
         })
-        const columnNames = result.fields.map((field: { name: any }) => field.name)
+
+        // For some reason when running CREATE TABLE statements,
+        // an array of results is returned with no obvious information added
+        // This is a way to bypass that weird behavior
+        if (Array.isArray(result)) {
+            result = result[0]
+        }
+
+        const columnNames = result.fields.map((field: { name: string }) => field.name)
         values = [columnNames, result.rows]
 
         await client.end()

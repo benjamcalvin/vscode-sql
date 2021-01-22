@@ -76,7 +76,6 @@ function parseDbFactsConnection(connId: string) {
 
 export async function getPostgresParams() {
     const activeConn = getActiveConn();
-
     var dbConnParams = {}
 
     if (activeConn.startsWith('(dbfacts)')) {
@@ -184,6 +183,7 @@ export async function addConn() {
 }
 
 async function sslPicker(){
+    // Show picker for enabling SSL in pg client
     let sslSelection = await vscode.window.showQuickPick(
         [
             'Yes (recommended)',
