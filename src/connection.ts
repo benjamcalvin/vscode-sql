@@ -140,10 +140,13 @@ export async function importConnFromDbfacts() {
     
     connId = '(dbfacts)' + connId
     const params = parseDbFactsConnection(connId)
-    const connection = {
+    var connection = {
         'type': params['type'],
-        'ssl': await sslPicker()
     }
+
+    if ((params['type'] == 'postgres') || (params['type'] == 'redshift')) {
+        connection['ssl'] = await sslPicker()
+    }    
     
     await saveConn(connId, connection)
 }

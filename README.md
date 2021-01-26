@@ -55,36 +55,40 @@ You can clear the results of multiple queries after highlighting them using
 
 ## Database Connections
 
-vcode-sql allows multiple connections of different database types.
-However, only one connection can be active at any time.
+vcode-sql can manage multiple connections.
+However, only one connection can be active at any given time.
 
 ### Adding a connection
+If you are adding a Bigquery connection, make sure you have logged in using
+`gcloud auth application-default login` before proceeding.
   1. Open the command palette and run `VS-SQL: Add Connection`
   2. Enter a connection name (only alphanumrics, dashes, and underscores allowed)
-  3. Select a connection type and enter other connection parameters
-  4. Select the newly added connection as the active connection
+  3. Select a connection type
+  4. (Postgres/Redshift only) Enter other connection parameters
+  5. Select the newly added connection as the active connection
 
-Note: To edit a connection, add a new connection with the same name will
-overwrites that connection parameters.
+Note: To edit a connection, add a new connection with the same name to
+overwrite it.
 
 ### Importing a connection from db-facts
 vscode-sql allows importing database credentials from
-[db-facts](https://github.com/bluelabsio/db-facts).
+[db-facts](https://github.com/bluelabsio/db-facts) (recommended for BlueLabs users).
 	
-  1. Check that the connection exist in db-facts by running
+  1. Check that the connection exists in db-facts by running
 	  `db-facts config <connection-name>` in the terminal
   2. Open the command palette and run `VS-SQL: Import Connection from db-facts`
-  3. Enter the db-facts connection name
-  4. Select the newly added connection as the active connection
+  3. Enter the db-facts connection name.
+  4. (Postgres/Redshift only) Select `Enable SSL` option.
+  5. Select the newly added connection as the active connection
 
 ### Selecting the active connection
-You can select or change the current active connection by running
-`VS-SQL: Select Active Connection` in the command palette or clicking
-on the vs-sql status bar item in the bottom left. This is useful when working
-with multiple databases.
+You can change the current active connection by running
+`VS-SQL: Select Active Connection` in the command palette or by clicking
+on the vs-sql status bar item in the bottom left. This is particularly useful
+when working with multiple databases.
 
 ### Deleting a connection
-Run `VS-SQL: Delete Connection` and select a connection to delete
+Run `VS-SQL: Delete Connection` and select the connection to delete
 
 ## Development
 1. Navigate into the `vscode-sql` directory.
@@ -109,7 +113,7 @@ For more information, see: https://code.visualstudio.com/api/working-with-extens
 
 ### Adding support for a new type of database connection
 To add support for a new database:
-1. Create a new file `myDb.ts`
+1. Create a new file `<myDb>.ts`
 2. This file should contain the following 4 functions with the appropriate return types.
    See `athena.ts` or `postgres.ts` for example.
 	- runQueryMyDb
@@ -171,6 +175,8 @@ billing quotas. The size of the query is quite negligible - on the order of a fe
 Running `getTables` (`cmd+shift+t`) does not count toward billing quotas.
 
 ## Release Notes
+### 0.1.2
+Enable SSL Connection.
 
 ### 0.1.1
 Fix db-facts restart issue. Add caching.
