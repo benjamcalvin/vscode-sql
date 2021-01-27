@@ -1,4 +1,4 @@
-import { Client } from 'ts-postgres';
+import { Client } from 'pg';
 import { getNthColumn } from './utils';
 import { getPostgresParams } from './connection'
 
@@ -7,18 +7,32 @@ export async function runQueryPostgres(query: string) {
     // column_names: list of string
     // result: return table as a 2D array
 
-    const connParams = await getPostgresParams()
-    const client = new Client(connParams);
-    await client.connect();
-
     var values: any;
     try {
-        const result = await client.query(query);
-        values = [result.names, result.rows]
+        const connParams = await getPostgresParams()
+        const client = new Client(connParams)
+        await client.connect();
+
+        var result = await client.query({
+            'text': query,
+            'values': [],
+            'rowMode': 'array',
+        })
+
+        // For some reason when running CREATE TABLE statements,
+        // an array of results is returned with no obvious information added
+        // This is a way to bypass that weird behavior
+        if (Array.isArray(result)) {
+            result = result[0]
+        }
+
+        const columnNames = result.fields.map((field: { name: string }) => field.name)
+        values = [columnNames, result.rows]
+
+        await client.end()
     } catch(e) {
+        console.log(e)
         values = (e as Error).message
-    } finally {
-        await client.end();
     }
     return values
 }

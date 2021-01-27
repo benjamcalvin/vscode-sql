@@ -18,7 +18,8 @@ const POSTGRES_PARAMS = [
     "port",
     "database",
     "user",
-    "password"
+    "password",
+    "ssl"
 ]
 
 // Store dbfacts connections
@@ -76,7 +77,7 @@ function parseDbFactsConnection(connId: string) {
 
 export async function getPostgresParams() {
     const activeConn = getActiveConn();
-    var dbConnParams = {};
+    var dbConnParams = {}
 
     if (activeConn.startsWith('(dbfacts)')) {
         let params = dbfactsConn[activeConn]
@@ -86,6 +87,9 @@ export async function getPostgresParams() {
             params = parseDbFactsConnection(activeConn)
             dbfactsConn[activeConn] = params
         }
+        // load ssl param from config since dbfacts doesn't have ssl
+        params['ssl'] = vscode.workspace.getConfiguration(`vscodeSql.connections.${activeConn}`).get('ssl')
+
         for (let key of POSTGRES_PARAMS) {
             dbConnParams[key] = params[key]
         }
@@ -95,6 +99,7 @@ export async function getPostgresParams() {
         }
         dbConnParams['password'] = await keytar.getPassword('vscode.vscode-sql', activeConn)
     }
+    
     // console.log('conn params', dbConnParams)
     return dbConnParams
 }
@@ -135,9 +140,13 @@ export async function importConnFromDbfacts() {
     
     connId = '(dbfacts)' + connId
     const params = parseDbFactsConnection(connId)
-    const connection = {
-        'type': params['type']
+    var connection = {
+        'type': params['type'],
     }
+
+    if ((params['type'] == 'postgres') || (params['type'] == 'redshift')) {
+        connection['ssl'] = await sslPicker()
+    }    
     
     await saveConn(connId, connection)
 }
@@ -162,20 +171,44 @@ export async function addConn() {
 
     if ((connType == 'postgres') || (connType == 'redshift')) {
         for (let key of POSTGRES_PARAMS) {
-            let value = await vscode.window.showInputBox({
-                placeHolder: `Enter ${key}`,
-                ignoreFocusOut: true,
-                password: key == 'password'
-            })
-            if (key == 'password') {
-                await keytar.setPassword('vscode.vscode-sql', connId, value)
+            if (key == 'ssl') {
+                connection['ssl'] = await sslPicker()
             } else {
-                connection[key] = value
+                let value = await vscode.window.showInputBox({
+                    placeHolder: `Enter ${key}`,
+                    ignoreFocusOut: true,
+                    password: key == 'password'
+                })
+                if (key == 'password') {
+                    await keytar.setPassword('vscode.vscode-sql', connId, value)
+                } else {
+                    connection[key] = value
+                }
             }
-        }
+        }        
     }
 
     await saveConn(connId, connection)
+}
+
+async function sslPicker(){
+    // Show picker for enabling SSL in pg client
+    let sslSelection = await vscode.window.showQuickPick(
+        [
+            'Yes (recommended)',
+            'No'
+        ],
+        {
+            placeHolder: `Enable SSL?`,
+            ignoreFocusOut: true,
+        }
+    )
+    let sslFlag = true
+    if (sslSelection == 'No') {
+        sslFlag = false
+    }
+
+    return sslFlag
 }
 
 async function saveConn(connId: string, connection: any) {
