@@ -207,8 +207,13 @@ async function sslPicker(){
     if (sslSelection == 'No') {
         sslFlag = false
     }
+    // Ref: https://github.com/brianc/node-postgres/issues/2009
+    let sslConfig = {
+        "require": sslFlag,
+        "rejectUnauthorized": false,
+    }
 
-    return sslFlag
+    return sslConfig
 }
 
 async function saveConn(connId: string, connection: any) {

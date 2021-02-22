@@ -4,7 +4,7 @@
 	"publisher": "benjamcalvin",
 	"repository": "https://github.com/benjamcalvin/vscode-sql",
 	"description": "Plugin for interactively running SQL queries.",
-	"version": "0.1.2",
+	"version": "0.1.3",
 	"engines": {
 		"vscode": "^1.49.0"
 	},

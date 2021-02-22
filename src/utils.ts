@@ -37,7 +37,8 @@ export function parse_queries(query: string, includeComments=false) {
 		"copy",
 		"with",
 		"delete",
-		"explain"
+		"explain",
+		"cancel"
 	]
 
 	var patterns = []
