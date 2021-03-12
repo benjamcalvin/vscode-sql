@@ -6,8 +6,6 @@ export async function runQueryBigquery(query: string) {
     const bigquery = new BigQuery();
     const options = {
         query: query,
-        // Location must match that of the dataset(s) referenced in the query.
-        location: 'US' or 'northamerica-northeast1',
         dryRun: false,
     };
 
