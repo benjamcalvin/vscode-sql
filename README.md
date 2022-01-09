@@ -175,6 +175,10 @@ billing quotas. The size of the query is quite negligible - on the order of a fe
 Running `getTables` (`cmd+shift+t`) does not count toward billing quotas.
 
 ## Release Notes
+
+### 0.1.5
+Add limited support for Snowflake. Still need to add support for schema commands.
+
 ### 0.1.3
 Patch SSL Certificate issue #12.
 

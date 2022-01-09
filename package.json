@@ -4,7 +4,7 @@
 	"publisher": "benjamcalvin",
 	"repository": "https://github.com/benjamcalvin/vscode-sql",
 	"description": "Plugin for interactively running SQL queries.",
-	"version": "0.1.4",
+	"version": "0.1.5",
 	"engines": {
 		"vscode": "^1.49.0"
 	},
@@ -144,6 +144,8 @@
 		"aws-sdk": "^2.1053.0",
 		"bars": "github:jstrace/bars",
 		"crypto-ts": "1.0.2",
+		"@angular/common": "^5.0.0",
+		"@angular/core": "^5.0.0",
 		"dataframe-js": "1.4.3",
 		"keytar": "7.2.0",
 		"pg": "8.5.1",
