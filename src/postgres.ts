@@ -1,6 +1,6 @@
 import { Client } from 'pg';
 import { getNthColumn } from './utils';
-import { getPostgresParams } from './connection'
+import { getConnParams } from './connection'
 
 export async function runQueryPostgres(query: string) {
     // Takes in a query and returns a list of [column_names, result].
@@ -9,7 +9,7 @@ export async function runQueryPostgres(query: string) {
 
     var values: any;
     try {
-        const connParams = await getPostgresParams()
+        const connParams = await getConnParams()
         const client = new Client(connParams)
         await client.connect();
 

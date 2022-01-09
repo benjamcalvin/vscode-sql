@@ -208,3 +208,6 @@ Add metadata functionality:
 Minimum functionality. Uses the AWS Athena Javascript SDK to run queries.
 
 **Enjoy!**
+
+### Note to Future Developers:
+- Colors is currently pinned because snowflake-sdk was affected by this error in colors: https://github.com/aws/aws-cdk/issues/18322 causing the extension to fail to load. I expect this will be resolved at some point.

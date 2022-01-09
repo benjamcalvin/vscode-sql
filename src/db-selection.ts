@@ -5,11 +5,14 @@ import { getActiveConnType } from './connection';
 import { listColumnsAthena, listTablesAthena, listDatabasesAthena, runQueryAthena } from './athena';
 import { listColumnsPostgres, listTablesPostgres, listSchemasPostgres, runQueryPostgres } from './postgres';
 import { listColumnsBigquery, listTablesBigquery, listDatasetsBigquery, runQueryBigquery } from './bigquery';
+import { listColumnsSnowflake, listTablesSnowflake, listSchemasSnowflake, runQuerySnowflake } from './snowflake';
 
 export function runQuery(query: string) {
     const activeConnType = getActiveConnType()
     if ((activeConnType == 'postgres') || (activeConnType == 'redshift')) {
         return runQueryPostgres(query);
+    } else if (activeConnType == 'snowflake') {
+        return runQuerySnowflake(query);
     } else if (activeConnType == 'bigquery') {
         return runQueryBigquery(query);
     } else {
@@ -21,6 +24,8 @@ export function listColumns(schema: string, table: string) {
     const activeConnType = getActiveConnType()
     if ((activeConnType == 'postgres') || (activeConnType == 'redshift')) {
         return listColumnsPostgres(schema, table);
+    } else if (activeConnType == 'snowflake') {
+        return listColumnsSnowflake(schema, table);
     } else if (activeConnType == 'bigquery') {
         return listColumnsBigquery(schema, table);
     } else {
@@ -32,6 +37,8 @@ export function listTables(schema: string) {
     const activeConnType = getActiveConnType()
     if ((activeConnType == 'postgres') || (activeConnType == 'redshift')) {
         return listTablesPostgres(schema);
+    } else if (activeConnType == 'snowflake') {
+        return listTablesSnowflake(schema);
     } else if (activeConnType == 'bigquery') {
         return listTablesBigquery(schema);
     } else {
@@ -43,6 +50,8 @@ export function listDatabases() {
     const activeConnType = getActiveConnType()
     if ((activeConnType == 'postgres') || (activeConnType == 'redshift')) {
         return listSchemasPostgres();
+    } else if (activeConnType == 'snowflake') {
+        return listSchemasSnowflake();
     } else if (activeConnType == 'bigquery') {
         return listDatasetsBigquery();
     } else {

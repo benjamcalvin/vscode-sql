@@ -10,7 +10,8 @@ const CONN_TYPE = [
     'athena',
     'bigquery',
     'postgres',
-    'redshift'
+    'redshift',
+    'snowflake',
 ]
 
 const POSTGRES_PARAMS = [
@@ -22,8 +23,14 @@ const POSTGRES_PARAMS = [
     "ssl"
 ]
 
+const SNOWFLAKE_PARAMS = [
+    "account",
+    "username",
+    "password"
+]
+
 // Store dbfacts connections
-var dbfactsConn = {}
+var dbfactsConn = {};
 // Create status bar item showing current active connection
 let myStatusBarItem: vscode.StatusBarItem
 
@@ -75,10 +82,19 @@ function parseDbFactsConnection(connId: string) {
     return params
 }
 
-export async function getPostgresParams() {
+export async function getConnParams() {
     const activeConn = getActiveConn();
-    var dbConnParams = {}
+    const connType = getActiveConnType();
+    var CONN_PARAMS = [];
 
+    if ((connType == 'postgres') || (connType == 'redshift')) {
+        CONN_PARAMS = POSTGRES_PARAMS;
+    } else if ((connType == 'snowflake')) {
+        CONN_PARAMS = SNOWFLAKE_PARAMS;
+    }
+
+    var dbConnParams = {};
+    
     if (activeConn.startsWith('(dbfacts)')) {
         let params = dbfactsConn[activeConn]
         // check for both null and undefined
@@ -90,11 +106,11 @@ export async function getPostgresParams() {
         // load ssl param from config since dbfacts doesn't have ssl
         params['ssl'] = vscode.workspace.getConfiguration(`vscodeSql.connections.${activeConn}`).get('ssl')
 
-        for (let key of POSTGRES_PARAMS) {
+        for (let key of CONN_PARAMS) {
             dbConnParams[key] = params[key]
         }
     } else {
-        for (let key of POSTGRES_PARAMS) {
+        for (let key of CONN_PARAMS) {
             dbConnParams[key] = vscode.workspace.getConfiguration(`vscodeSql.connections.${activeConn}`).get(key)
         }
         dbConnParams['password'] = await keytar.getPassword('vscode.vscode-sql', activeConn)
@@ -103,6 +119,7 @@ export async function getPostgresParams() {
     // console.log('conn params', dbConnParams)
     return dbConnParams
 }
+
 
 export function getConnections() {
     const connections = getAllConns();
@@ -186,6 +203,19 @@ export async function addConn() {
                 }
             }
         }        
+    } else if ((connType == 'snowflake')) {
+        for (let key of SNOWFLAKE_PARAMS) {
+            let value = await vscode.window.showInputBox({
+                placeHolder: `Enter ${key}`,
+                ignoreFocusOut: true,
+                password: key == 'password'
+            });
+            if (key == 'password') {
+                await keytar.setPassword('vscode.vscode-sql', connId, value);
+            } else {
+                connection[key] = value;
+            }
+        }
     }
 
     await saveConn(connId, connection)

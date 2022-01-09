@@ -28,7 +28,7 @@ async function runSQLTable() {
 
 	// Get active text editor
 	let editor = vscode.window.activeTextEditor;
-
+	console.log("runSQLTable")
 	if (editor) {
 		const document = editor.document;
 		const selection = editor.selection;
@@ -52,6 +52,7 @@ async function runSQLTable() {
 			// This expects a tuple of results [columns, values] where columns is
 			// a 1-dimensional array of column names and values is a 2-dimensional
 			// array of rows, and columns respectively.
+			console.log(queries[i].text);
 			results.push(await runQuery(queries[i].text));
 			
 			editor.edit(editBuilder => {

@@ -5,8 +5,10 @@ import { wait } from "./utils";
 const ATHENA_DATA_CATALOG = "AwsDataCatalog";
 
 export async function runQueryAthena(query: string) {
+	console.log("RunQueryAthena")
     // Takes in a query and returns a DataFrame with the results.
 	var startQueryExecutionResponse = await startQueryExecution(query)
+	console.log(startQueryExecutionResponse)
 	const queryExecutionId = startQueryExecutionResponse['QueryExecutionId']
 	var queryNotDone = true;
 	var getQueryResultsResponse;
@@ -20,6 +22,7 @@ export async function runQueryAthena(query: string) {
 		if (getQueryResultsResponse == "Query has not yet finished. Current state: RUNNING") {
 			console.log("Waiting...", getQueryResultsResponse);
         } else {
+			console.log(getQueryResultsResponse)
             queryNotDone = false;
         }
     }
@@ -72,26 +75,32 @@ function unpackRow(row: any) {
 
 
 async function startQueryExecution(query: string) {
-	const athena = new AWS.Athena();
+	console.log("startQueryExecution");
+	const athena = new AWS.Athena({region:'us-east-2'});
+	console.log("Athena")
+	console.log(athena)
 	const query_params = {
 		QueryString: query,
-		ResultConfiguration: {
-			OutputLocation: 's3://sandbox-ephemeral-data/queries/'
-		}
+		WorkGroup: 'techco'
+		// ,
+		// ResultConfiguration: {
+		// 	OutputLocation: 's3://sandbox-ephemeral-data/queries/'
+		// }
 	}
 	return athena.startQueryExecution(query_params).promise()
 }
 
 async function getQueryResults(queryExecutionId: string) {
-	const athena = new AWS.Athena();
+	console.log("getQueryResponse");
+	const athena = new AWS.Athena({region:'us-east-2'});
 	const query_params = {
-		QueryExecutionId: queryExecutionId
+		QueryExecutionId: queryExecutionId,
 	}
 	return athena.getQueryResults(query_params).promise()
 }
 
 export async function listDatabasesAthena() {
-	const athena = new AWS.Athena();
+	const athena = new AWS.Athena({region:'us-east-2'});
 	const params = {
 		CatalogName: ATHENA_DATA_CATALOG,
 	}
@@ -108,7 +117,7 @@ export async function listDatabasesAthena() {
 }
 
 export async function listTablesAthena(databaseName: string) {
-	const athena = new AWS.Athena();
+	const athena = new AWS.Athena({region:'us-east-2'});
 	const params = {
 		CatalogName: ATHENA_DATA_CATALOG,
 		DatabaseName: databaseName,
@@ -126,7 +135,7 @@ export async function listTablesAthena(databaseName: string) {
 }
 
 export async function listColumnsAthena(database: string, table: string) {
-	const athena = new AWS.Athena();
+	const athena = new AWS.Athena({region:'us-east-2'});
 	const params = {
 		CatalogName: ATHENA_DATA_CATALOG,
 		DatabaseName: database,
