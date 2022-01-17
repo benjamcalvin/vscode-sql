@@ -11,10 +11,6 @@ export async function runQuerySnowflake(query: string) {
 
     try {
         const connParams = await getConnParams()
-        console.log(connParams);
-        console.log(connParams['account']);
-        console.log(connParams['user']);
-
         var conn = createConnection(connParams);
 
         // Try to connect to Snowflake, and check whether the connection was successful.
@@ -46,13 +42,13 @@ export async function runQuerySnowflake(query: string) {
             });
         });
 
-        console.log("Here are the results:");
-        console.log(results);
+        // console.log("Here are the results:");
+        // console.log(results);
         var columns: any;
         values = [];
         for (var row = 0; row < results.length; row++) {
             if (row == 0) {
-                console.log(results[row]);
+                // console.log(results[row]);
                 columns = Object.keys(results[row]);
             }
             // JS Objects not guaranteed to be ordered? May not matter in vscode, but to be safe..
@@ -62,7 +58,7 @@ export async function runQuerySnowflake(query: string) {
             }
         }
         values = [columns, values];
-        console.log(values);
+        // console.log(values);
 
     } catch (e) {
         console.log(e);
@@ -72,20 +68,34 @@ export async function runQuerySnowflake(query: string) {
     return values;
 }
 
-export async function listSchemasSnowflake() {
+export async function listDatabasesSnowflake() {
+    var databases = [];
+    const databaseQuery = "SELECT database_name FROM information_schema.databases;";
+    const databaseQueryResult = await runQuerySnowflake(databaseQuery);
+    databases = getNthColumn(databaseQueryResult[1], 0);
+    return databases;
+}
+
+export async function listSchemasSnowflake(database: string) {
     var schemas = [];
-    // TODO
+    const schemaQuery = `SELECT SCHEMA_NAME FROM ${database}.INFORMATION_SCHEMA.SCHEMATA;`;
+    const schemaQueryResult = await runQuerySnowflake(schemaQuery);
+    schemas = getNthColumn(schemaQueryResult[1], 0);
     return schemas;
 }
 
-export async function listTablesSnowflake(schema: string) {
+export async function listTablesSnowflake(database: string, schema: string) {
     var tables = [];
-    // TODO
+    const tableQuery = `SELECT TABLE_NAME FROM ${database}.INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '${schema}';`;
+    const tableQueryResult = await runQuerySnowflake(tableQuery);
+    tables = getNthColumn(tableQueryResult[1], 0);
     return tables;
 }
 
-export async function listColumnsSnowflake(schema: string, table: string) {
+export async function listColumnsSnowflake(database: string, schema: string, table: string) {
     var columns = [];
-    // TODO
-    return columns
+    const columnQuery = `SELECT COLUMN_NAME FROM ${database}.INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '${schema}' AND TABLE_NAME = '${table}';`;
+    const columnQueryResult = await runQuerySnowflake(columnQuery);
+    columns = getNthColumn(columnQueryResult[1], 0);
+    return columns;
 }

@@ -7,16 +7,18 @@ import { Query } from './query';
 import { parse_queries, fuzzyQuickPick } from './utils';
 import {
 	runQuery,
-	listDatabases,
+	listSchemas,
 	listTables,
-	listColumns
+	listColumns,
+	listDatabases,
 } from './db-selection';
 import { 
 	selectActiveConn,
 	addConn,
 	deleteConn,
 	importConnFromDbfacts,
-	setupConnection
+	setupConnection,
+	getActiveConnType
 } from './connection'
 
 
@@ -107,20 +109,38 @@ async function runSQLHistogram() {
 
 async function getTables() {
 
-	const databases = await listDatabases();
-	console.log(databases);
-	const schema = await fuzzyQuickPick(databases);
+	const connType = getActiveConnType();
+
+	var database = undefined;
+	if (connType == 'snowflake') {
+		const databases = await listDatabases();
+		database = await fuzzyQuickPick(databases);
+	}
+
+	const schemas = await listSchemas(database);
+	const schema = await fuzzyQuickPick(schemas);
 	
-	const tables = await listTables(schema);
+	const tables = await listTables(schema, database);
 	const table = await fuzzyQuickPick(tables);
 
 	const editor = vscode.window.activeTextEditor;
 	const selections = editor.selections;
 
+	var fullTable = "";
+	if (typeof(database) != "undefined") {
+		fullTable = fullTable + database + ".";
+	} 
+	if (typeof(database) != "undefined") {
+		fullTable = fullTable + schema + ".";
+	}
+	if (typeof(database) != "undefined") {
+		fullTable = fullTable + table;
+	}
+
 	if (editor) {
 		editor.edit(editBuilder => {
 			for (var i = 0; i < selections.length; i++) {
-				editBuilder.replace(selections[i], schema+"."+table);
+				editBuilder.replace(selections[i], fullTable);
 			}
 		}).then(success => {
 			// Change the selection: start and end position of the new
@@ -137,14 +157,21 @@ async function findColumn() {
 	const selections = editor.selections;
 
 	if (editor) {
-		const databases = await listDatabases();
-		console.log(databases);
-		const schema = await fuzzyQuickPick(databases);
-		
-		const tables = await listTables(schema);
-		const table = await fuzzyQuickPick(tables);
-		const columns = await listColumns(schema, table);
+		const connType = getActiveConnType();
 
+		var database = undefined;
+		if (connType == 'snowflake') {
+			const databases = await listDatabases();
+			database = await fuzzyQuickPick(databases);
+		}
+	
+		const schemas = await listSchemas(database);
+		const schema = await fuzzyQuickPick(schemas);
+		
+		const tables = await listTables(schema, database);
+		const table = await fuzzyQuickPick(tables);
+
+		const columns = await listColumns(schema, table, database);
 		const column = await fuzzyQuickPick(columns);
 		
 		if (editor) {
@@ -166,14 +193,21 @@ async function getColumns() {
 	const selections = editor.selections;
 
 	if (editor) {
+		const connType = getActiveConnType();
+
+		var database = undefined;
+		if (connType == 'snowflake') {
+			const databases = await listDatabases();
+			database = await fuzzyQuickPick(databases);
+		}
+	
+		const schemas = await listSchemas(database);
+		const schema = await fuzzyQuickPick(schemas);
 		
-		const databases = await listDatabases();
-		console.log(databases);
-		const schema = await fuzzyQuickPick(databases);
-		
-		const tables = await listTables(schema);
+		const tables = await listTables(schema, database);
 		const table = await fuzzyQuickPick(tables);
-		const columns = await listColumns(schema, table);
+
+		const columns = await listColumns(schema, table, database);
 		
 		if (editor) {
 			editor.edit(editBuilder => {

@@ -87,7 +87,7 @@ export async function fuzzyQuickPick(selections: string[]) {
 				fuzzyPick.onDidChangeValue(value => {
 					let alphaNumericList = value.replace(/\W/gi, '').split('')
 					let pattern = alphaNumericList.join('.*')
-					let regex = new RegExp(pattern)
+					let regex = new RegExp(pattern, "i")
 					var updatedSelections = []
 					
 					for (let item of allSelections) {

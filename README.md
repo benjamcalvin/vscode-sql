@@ -176,6 +176,11 @@ Running `getTables` (`cmd+shift+t`) does not count toward billing quotas.
 
 ## Release Notes
 
+### 0.1.6
+
+- Add extended support for Snowflake including list tables/columns.
+- Extended fuzzy picker regex to be case-insensitive.
+
 ### 0.1.5
 Add limited support for Snowflake. Still need to add support for schema commands.
 
